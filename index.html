@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Niru Study Notes</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><div class="logo">NS</div><div><h1>Niru Study Notes</h1><p>B.Sc. PCM • English | ಕನ್ನಡ</p></div></header>
+<main>
+<section class="card"><h2>Student access</h2><p>Create a free account. Protected notes will be available after administrator approval.</p><p id="message" class="message">Not signed in.</p></section>
+<section id="auth" class="grid">
+<form id="signup" class="card"><h2>Register</h2><label>Full name<input id="name" required maxlength="80"></label><label>Email<input id="signupEmail" type="email" required></label><label>Password (6+ characters)<input id="signupPassword" type="password" minlength="6" required></label><button>Register</button></form>
+<form id="login" class="card"><h2>Sign in</h2><label>Email<input id="loginEmail" type="email" required></label><label>Password<input id="loginPassword" type="password" required></label><button>Sign in</button></form>
+</section>
+<section id="account" class="card hidden"><div class="row"><div><h2 id="welcome">Account</h2><p id="email"></p></div><button id="logout" class="secondary" type="button">Sign out</button></div><p id="studentStatus" class="message"></p></section>
+<section id="admin" class="card hidden"><h2>Admin panel — student approvals</h2><p>Approve recognized students. Security rules, not just this page, enforce permissions.</p><button id="refresh" class="secondary" type="button">Refresh list</button><span id="count"></span><div id="users"></div>
+<hr>
+<h2>Add Study Notes</h2>
+
+<form id="addNoteForm">
+  <label>
+    Note title
+    <input id="noteTitle" required maxlength="150"
+      placeholder="Example: Laws of Thermodynamics">
+  </label>
+
+  <label>
+    Subject
+    <select id="noteSubject" required>
+      <option value="">Select subject</option>
+      <option value="Mathematics">Mathematics</option>
+      <option value="Physics">Physics</option>
+      <option value="Chemistry">Chemistry</option>
+    </select>
+  </label>
+
+  <label>
+    Semester
+    <select id="noteSemester" required>
+      <option value="">Select semester</option>
+      <option value="1">Semester 1</option>
+      <option value="2">Semester 2</option>
+      <option value="3">Semester 3</option>
+      <option value="4">Semester 4</option>
+      <option value="5">Semester 5</option>
+      <option value="6">Semester 6</option>
+    </select>
+  </label>
+
+  <label>
+    Notes content
+    <textarea id="noteContent" rows="8" required
+      maxlength="30000"
+      placeholder="Write your notes here..."></textarea>
+  </label>
+
+  <button type="submit">Publish Notes</button>
+</form>
+
+<p id="noteAdminMessage" class="message"></p>
+</section>
+<section id="materials" class="card hidden">
+  <h2>Study Notes Library</h2>
+  <p>Read your B.Sc. PCM notes and previous question papers online.</p>
+
+  <div id="notesList">
+    <p>Loading study notes...</p>
+  </div>
+
+  <div id="noteReader" class="hidden">
+    <button id="backToNotes" type="button" class="secondary">
+      ← Back to notes
+    </button>
+    <h3 id="readingTitle"></h3>
+    <div id="readingContent"></div>
+  </div>
+</section>
+</main><footer>© <span id="year"></span> Niru Study Notes • Learn Today, Succeed Tomorrow!</footer>
+<script type="module" src="app.js"></script></body></html>
