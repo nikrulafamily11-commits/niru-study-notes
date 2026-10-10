@@ -388,62 +388,7 @@ async function loadUsers() {
   }
 }
 
-  if (!isAdmin(auth.currentUser)) {
-    message("Only the configured administrator can see student accounts.", "error");
-    return;
-  }
-  const root = $("users");
-  root.replaceChildren(document.createTextNode("Loading accounts…"));
-  try {
-    const snap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
-    root.replaceChildren();
-    $("count").textContent = `${snap.size} account(s)`;
-    if (snap.empty) { root.append(makeEmpty("No student accounts yet.")); return; }
-    snap.forEach(s => {
-      const u = s.data();
-      const row = document.createElement("div"); row.className = "user-row";
-      const info = document.createElement("div"); info.className = "user-info";
-      const name = document.createElement("strong"); name.textContent = u.name || "Student";
-      const email = document.createElement("span"); email.textContent = u.email || "";
-      const state = document.createElement("span");
-      const status = ["approved", "rejected", "pending"].includes(u.status) ? u.status : "pending";
-      state.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-      state.className = "pill " + (status === "approved" ? "approved" : status === "rejected" ? "rejected" : "");
-      info.append(name, email, state);
-      const actions = document.createElement("div"); actions.className = "user-actions";
-      const approve = document.createElement("button");
-      approve.textContent = status === "approved" ? "Revoke access" : "Approve";
-      approve.className = status === "approved" ? "secondary" : "";
-      approve.addEventListener("click", async () => {
-        approve.disabled = true;
-        try {
-          const next = status === "approved" ? "pending" : "approved";
-          await updateDoc(doc(db, "users", s.id), { status: next, reviewedAt: serverTimestamp(), reviewedBy: auth.currentUser.uid });
-          message(`${u.name || u.email}: ${next}.`, "success");
-          await loadUsers();
-        } catch (err) { message(errorText(err), "error"); approve.disabled = false; }
-      });
-      const reject = document.createElement("button");
-      reject.textContent = "Reject";
-      reject.className = "danger";
-      reject.disabled = status === "rejected";
-      reject.addEventListener("click", async () => {
-        reject.disabled = true;
-        try {
-          await updateDoc(doc(db, "users", s.id), { status: "rejected", reviewedAt: serverTimestamp(), reviewedBy: auth.currentUser.uid });
-          message(`${u.name || u.email}: rejected.`, "success");
-          await loadUsers();
-        } catch (err) { message(errorText(err), "error"); reject.disabled = false; }
-      });
-      actions.append(approve, reject);
-      row.append(info, actions);
-      root.append(row);
-    });
-  } catch (e) {
-    root.replaceChildren(makeEmpty("Could not load accounts. Check your Firestore security rules."));
-    message(errorText(e), "error");
-  }
-}
+
 
 function buildPdfCard(note) {
   const card = document.createElement("article"); card.className = "pdf-card";
