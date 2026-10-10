@@ -164,7 +164,230 @@ $("semesterFilters").addEventListener("click", async e => {
   await loadStudentNotes();
 });
 
+
 async function loadUsers() {
+  if (!isAdmin(auth.currentUser)) {
+    message("Only the configured administrator can see student accounts.", "error");
+    return;
+  }
+
+  const root = $("users");
+  const parent = root.parentElement;
+
+  // Create the collapsible panel controls only once.
+  let toggle = $("studentManagementToggle");
+  let tabs = $("studentManagementTabs");
+
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.id = "studentManagementToggle";
+    toggle.type = "button";
+    toggle.className = "secondary";
+    toggle.style.width = "100%";
+    toggle.style.marginBottom = "12px";
+    toggle.textContent = "Student Management  +";
+    parent.insertBefore(toggle, root);
+
+    tabs = document.createElement("div");
+    tabs.id = "studentManagementTabs";
+    tabs.className = "hidden";
+    tabs.style.display = "flex";
+    tabs.style.flexWrap = "wrap";
+    tabs.style.gap = "8px";
+    tabs.style.marginBottom = "12px";
+    parent.insertBefore(tabs, root);
+
+    ["pending", "approved", "rejected"].forEach(status => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.dataset.userStatus = status;
+      tab.className = "secondary";
+      tab.addEventListener("click", () => {
+        activeUserStatus = status;
+        loadUsers();
+      });
+      tabs.append(tab);
+    });
+
+    toggle.addEventListener("click", () => {
+      studentManagementOpen = !studentManagementOpen;
+      toggle.textContent = studentManagementOpen
+        ? "Student Management  −"
+        : "Student Management  +";
+
+      tabs.classList.toggle("hidden", !studentManagementOpen);
+      root.classList.toggle("hidden", !studentManagementOpen);
+
+      if (studentManagementOpen) {
+        loadUsers();
+      }
+    });
+
+    // Keep the student list collapsed when the page first loads.
+    root.classList.add("hidden");
+  }
+
+  root.replaceChildren(document.createTextNode("Loading accounts…"));
+
+  try {
+    const snap = await getDocs(
+      query(collection(db, "users"), orderBy("createdAt", "desc"))
+    );
+
+    const students = snap.docs.map(s => ({
+      id: s.id,
+      ...s.data()
+    }));
+
+    const statuses = ["pending", "approved", "rejected"];
+    const counts = {};
+
+    statuses.forEach(status => {
+      counts[status] = students.filter(u => {
+        const actual = ["pending", "approved", "rejected"].includes(u.status)
+          ? u.status
+          : "pending";
+        return actual === status;
+      }).length;
+    });
+
+    $("count").textContent = `${snap.size} account(s)`;
+
+    // Update tab labels and selected state.
+    tabs.querySelectorAll("button[data-user-status]").forEach(tab => {
+      const status = tab.dataset.userStatus;
+      const label = status.charAt(0).toUpperCase() + status.slice(1);
+
+      tab.textContent = `${label} (${counts[status]})`;
+      tab.className =
+        status === activeUserStatus ? "active" : "secondary";
+      tab.setAttribute(
+        "aria-pressed",
+        String(status === activeUserStatus)
+      );
+    });
+
+    root.replaceChildren();
+
+    if (snap.empty) {
+      root.append(makeEmpty("No student accounts yet."));
+      return;
+    }
+
+    if (!studentManagementOpen) {
+      return;
+    }
+
+    const filtered = students.filter(u => {
+      const status = ["pending", "approved", "rejected"].includes(u.status)
+        ? u.status
+        : "pending";
+      return status === activeUserStatus;
+    });
+
+    if (!filtered.length) {
+      root.append(
+        makeEmpty(`No ${activeUserStatus} student accounts.`)
+      );
+      return;
+    }
+
+    filtered.forEach(u => {
+      const row = document.createElement("div");
+      row.className = "user-row";
+
+      const info = document.createElement("div");
+      info.className = "user-info";
+
+      const name = document.createElement("strong");
+      name.textContent = u.name || "Student";
+
+      const email = document.createElement("span");
+      email.textContent = u.email || "";
+
+      const status = ["pending", "approved", "rejected"].includes(u.status)
+        ? u.status
+        : "pending";
+
+      const state = document.createElement("span");
+      state.textContent =
+        status.charAt(0).toUpperCase() + status.slice(1);
+      state.className =
+        "pill " +
+        (status === "approved"
+          ? "approved"
+          : status === "rejected"
+            ? "rejected"
+            : "");
+
+      info.append(name, email, state);
+
+      const actions = document.createElement("div");
+      actions.className = "user-actions";
+
+      const approve = document.createElement("button");
+      approve.textContent =
+        status === "approved" ? "Revoke access" : "Approve";
+      approve.className = status === "approved" ? "secondary" : "";
+
+      approve.addEventListener("click", async () => {
+        approve.disabled = true;
+
+        try {
+          const next =
+            status === "approved" ? "pending" : "approved";
+
+          await updateDoc(doc(db, "users", u.id), {
+            status: next,
+            reviewedAt: serverTimestamp(),
+            reviewedBy: auth.currentUser.uid
+          });
+
+          message(`${u.name || u.email}: ${next}.`, "success");
+          await loadUsers();
+          await loadStudentNotes();
+        } catch (err) {
+          message(errorText(err), "error");
+          approve.disabled = false;
+        }
+      });
+
+      const reject = document.createElement("button");
+      reject.textContent = "Reject";
+      reject.className = "danger";
+      reject.disabled = status === "rejected";
+
+      reject.addEventListener("click", async () => {
+        reject.disabled = true;
+
+        try {
+          await updateDoc(doc(db, "users", u.id), {
+            status: "rejected",
+            reviewedAt: serverTimestamp(),
+            reviewedBy: auth.currentUser.uid
+          });
+
+          message(`${u.name || u.email}: rejected.`, "success");
+          await loadUsers();
+          await loadStudentNotes();
+        } catch (err) {
+          message(errorText(err), "error");
+          reject.disabled = false;
+        }
+      });
+
+      actions.append(approve, reject);
+      row.append(info, actions);
+      root.append(row);
+    });
+  } catch (e) {
+    root.replaceChildren(
+      makeEmpty("Could not load accounts. Check your Firestore security rules.")
+    );
+    message(errorText(e), "error");
+  }
+}
+
   if (!isAdmin(auth.currentUser)) {
     message("Only the configured administrator can see student accounts.", "error");
     return;
