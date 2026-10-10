@@ -150,34 +150,7 @@ $("addNoteForm").addEventListener("submit", async e => {
   }
 });
 
-  e.preventDefault();
-  if (!isAdmin(auth.currentUser)) {
-    $("noteAdminMessage").textContent = "Only the administrator can add PDFs.";
-    $("noteAdminMessage").className = "message error";
-    return;
-  }
-  const btn = e.currentTarget.querySelector('button[type="submit"]');
-  btn.disabled = true;
-  try {
-    const title = $("noteTitle").value.trim();
-    const semester = Number($("noteSemester").value);
-    const url = safeUrl($("noteUrl").value.trim());
-    if (!url) throw new Error("Enter a valid http or https PDF link.");
-    if (!Number.isInteger(semester) || semester < 1 || semester > 6) throw new Error("Choose a semester from 1 to 6.");
-    await addDoc(collection(db, "notes"), {
-      title, semester, url, createdAt: serverTimestamp(), createdBy: auth.currentUser.uid
-    });
-    e.currentTarget.reset();
-    $("noteAdminMessage").textContent = "PDF added to the study library.";
-    $("noteAdminMessage").className = "message success";
-    await loadAdminNotes();
-  } catch (err) {
-    $("noteAdminMessage").textContent = errorText(err);
-    $("noteAdminMessage").className = "message error";
-  } finally {
-    btn.disabled = false;
-  }
-});
+
 
 $("semesterFilters").addEventListener("click", async e => {
   const btn = e.target.closest("button[data-semester]");
