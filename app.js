@@ -20,6 +20,10 @@ $("year").textContent = new Date().getFullYear();
 let activeSemester = "all";
 let currentProfile = null;
 
+// Student management panel settings
+let studentManagementOpen = false;
+let activeUserStatus = "pending";
+
 function message(text, type = "") {
   $("message").textContent = text;
   $("message").className = "message " + type;
