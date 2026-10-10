@@ -96,7 +96,60 @@ $("refresh").addEventListener("click", async () => {
   await loadUsers();
   await loadAdminNotes();
 });
+
 $("addNoteForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const btn = form.querySelector('button[type="submit"]');
+
+  if (!isAdmin(auth.currentUser)) {
+    $("noteAdminMessage").textContent =
+      "Only the administrator can add PDFs.";
+    $("noteAdminMessage").className = "message error";
+    return;
+  }
+
+  btn.disabled = true;
+
+  try {
+    const title = $("noteTitle").value.trim();
+    const semester = Number($("noteSemester").value);
+    const url = safeUrl($("noteUrl").value.trim());
+
+    if (!url) {
+      throw new Error("Enter a valid http or https PDF link.");
+    }
+
+    if (!Number.isInteger(semester) || semester < 1 || semester > 6) {
+      throw new Error("Choose a semester from 1 to 6.");
+    }
+
+    await addDoc(collection(db, "notes"), {
+      title,
+      semester,
+      url,
+      createdAt: serverTimestamp(),
+      createdBy: auth.currentUser.uid
+    });
+
+    form.reset();
+
+    $("noteAdminMessage").textContent =
+      "PDF added to the study library.";
+    $("noteAdminMessage").className = "message success";
+
+    await loadAdminNotes();
+    await loadStudentNotes();
+
+  } catch (err) {
+    $("noteAdminMessage").textContent = errorText(err);
+    $("noteAdminMessage").className = "message error";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
   e.preventDefault();
   if (!isAdmin(auth.currentUser)) {
     $("noteAdminMessage").textContent = "Only the administrator can add PDFs.";
