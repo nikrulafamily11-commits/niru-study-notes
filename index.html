@@ -1,233 +1,83 @@
-```html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#173b70">
-  <title>Niru Study Notes | Learn Today, Succeed Tomorrow</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="site-header">
-    <div class="brand">
-      <img class="logo-image" src="niru-logo.png" alt="Niru Study Notes logo">
-      <div>
-        <h1>Niru Study Notes</h1>
-        <p>B.Sc. PCM <span>•</span> English</p>
-      </div>
+
+<section id="admin" class="card hidden">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">ADMINISTRATOR</span>
+      <h2>Student management</h2>
+      <p class="muted">Review registrations and manage library resources.</p>
     </div>
-    <div class="header-tag">Your learning journey starts here</div>
-  </header>
+    <button id="refresh" class="secondary" type="button">Refresh list</button>
+  </div>
 
-  <main>
-    <section class="hero card">
-      <div class="hero-copy hero-nature">
-        <img src="nature-waterfall.png"
-             alt="Peaceful waterfall, green forest, and sunrise over the mountains"
-             class="hero-nature-image">
-      </div>
+  <div class="count-line">
+    <span id="count">Loading accounts…</span>
+  </div>
 
-      <div class="quote-card">
-        <span class="quote-mark">“</span>
-        <p>“My biggest dream is not to become rich, but to make my parents smile with pride. 🥹❤️”</p>
-        <small>— A promise to my parents</small>
-        <hr>
-        <p class="education-quote">“A teacher is a lamp that lights the path from ignorance to knowledge. 🪔”</p>
-        <small>— Respect every teacher</small>
-        <hr>
-        <p class="education-quote">“Don't study only to pass an examination. Study to understand the world and create a better future. 🎯”</p>
-        <small>— Your future begins with learning</small>
-      </div>
-    </section>
+  <!-- Student status tabs -->
+  <div class="student-status-tabs" role="group"
+       aria-label="Filter students by status">
+    <button type="button"
+            data-user-status="pending"
+            class="active"
+            aria-pressed="true">Pending</button>
 
-    <section class="card music-card">
-      <div>
-        <strong>🎵 A little music for your learning journey</strong>
-        <p>Play or pause your login music whenever you like.</p>
-      </div>
-      <audio id="loginMusic" controls preload="metadata">
-        <source src="login-song.mpeg" type="audio/mpeg">
-        Your browser does not support audio playback.
-      </audio>
-    </section>
+    <button type="button"
+            data-user-status="approved"
+            aria-pressed="false">Approved</button>
 
-    <section class="card status-card">
-      <div class="status-icon">✦</div>
-      <div>
-        <h2>Welcome to your study space</h2>
-        <p>Create a free account. Your notes library will appear after the administrator approves your account.</p>
-      </div>
-      <p id="message" class="message" role="status">Not signed in.</p>
-    </section>
+    <button type="button"
+            data-user-status="rejected"
+            aria-pressed="false">Rejected</button>
+  </div>
 
-    <section id="auth" class="auth-layout">
-      <div class="auth-cards">
-        <form id="login" class="card form-card">
-          <h2>Welcome back</h2>
-          <p class="muted">Sign in to your Niru Study Notes account.</p>
+  <!-- Selected student category -->
+  <div id="users" aria-live="polite">
+    <p>Loading student accounts…</p>
+  </div>
 
-          <label>Email address
-            <input id="loginEmail" type="email" autocomplete="email"
-                   required placeholder="you@example.com">
-          </label>
+  <hr class="section-rule">
 
-          <label>Password
-            <div class="password-wrap">
-              <input id="loginPassword" type="password"
-                     autocomplete="current-password" required
-                     placeholder="Enter your password">
-              <button class="toggle-password" type="button"
-                      data-password="loginPassword"
-                      aria-label="Show login password">Show</button>
-            </div>
-          </label>
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">LIBRARY CONTENT</span>
+      <h2>Add a PDF resource</h2>
+      <p class="muted">Add a title, semester and a link to the PDF.</p>
+    </div>
+  </div>
 
-          <button type="submit" class="full-button">Sign in to your account</button>
-          <p class="switch-form">Don't have an account?
-            <button type="button" id="showSignup" class="text-button">Register</button>
-          </p>
-        </form>
+  <form id="addNoteForm" class="note-form">
+    <label>PDF title
+      <input id="noteTitle" required maxlength="150"
+             placeholder="Example: Laws of Thermodynamics">
+    </label>
 
-        <form id="signup" class="card form-card hidden">
-          <h2>Create your account</h2>
-          <p class="muted">Join Niru Study Notes for free.</p>
+    <label>Semester
+      <select id="noteSemester" required>
+        <option value="">Choose semester</option>
+        <option value="1">Semester 1</option>
+        <option value="2">Semester 2</option>
+        <option value="3">Semester 3</option>
+        <option value="4">Semester 4</option>
+        <option value="5">Semester 5</option>
+        <option value="6">Semester 6</option>
+      </select>
+    </label>
 
-          <label>Full name
-            <input id="name" autocomplete="name" required maxlength="80"
-                   placeholder="Enter your full name">
-          </label>
+    <label>PDF link
+      <input id="noteUrl" type="url" required
+             placeholder="https://drive.google.com/...">
+      <span class="help-text">
+        Use a valid PDF URL. Restricted Drive files still require Google Drive permission for each approved student.
+      </span>
+    </label>
 
-          <label>Email address
-            <input id="signupEmail" type="email" autocomplete="email"
-                   required placeholder="you@example.com">
-          </label>
+    <button type="submit" class="full-button">Add PDF to library</button>
+  </form>
 
-          <label>Password <span class="label-hint">(at least 6 characters)</span>
-            <div class="password-wrap">
-              <input id="signupPassword" type="password"
-                     autocomplete="new-password" minlength="6" required
-                     placeholder="Create a password">
-              <button class="toggle-password" type="button"
-                      data-password="signupPassword"
-                      aria-label="Show registration password">Show</button>
-            </div>
-          </label>
+  <p id="noteAdminMessage" class="message" role="status"></p>
 
-          <button type="submit" class="full-button">Create free account</button>
-          <p class="switch-form">Already have an account?
-            <button type="button" id="showLogin" class="text-button">Back to Login</button>
-          </p>
-        </form>
-      </div>
-    </section>
-
-    <section id="account" class="card hidden">
-      <div class="account-heading">
-        <div>
-          <span class="eyebrow">YOUR ACCOUNT</span>
-          <h2 id="welcome">Account</h2>
-          <p id="email" class="muted"></p>
-        </div>
-        <button id="logout" class="secondary" type="button">Sign out</button>
-      </div>
-      <p id="studentStatus" class="message"></p>
-    </section>
-
-    <section id="admin" class="card hidden">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">ADMINISTRATOR</span>
-          <h2>Student management</h2>
-          <p class="muted">Review registrations and manage library resources.</p>
-        </div>
-        <button id="refresh" class="secondary" type="button">Refresh list</button>
-      </div>
-
-      <div class="count-line"><span id="count">Loading accounts…</span></div>
-
-      <!-- Student status filters -->
-      <div class="student-status-tabs" role="group"
-           aria-label="Filter students by status">
-        <button type="button" data-user-status="pending" class="active">Pending</button>
-        <button type="button" data-user-status="approved">Approved</button>
-        <button type="button" data-user-status="rejected">Rejected</button>
-      </div>
-
-      <!-- Only the selected category will be displayed here -->
-      <div id="users"><p>Loading student accounts…</p></div>
-
-      <hr class="section-rule">
-
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">LIBRARY CONTENT</span>
-          <h2>Add a PDF resource</h2>
-          <p class="muted">Add a title, semester and a link to the PDF.</p>
-        </div>
-      </div>
-
-      <form id="addNoteForm" class="note-form">
-        <label>PDF title
-          <input id="noteTitle" required maxlength="150"
-                 placeholder="Example: Laws of Thermodynamics">
-        </label>
-
-        <label>Semester
-          <select id="noteSemester" required>
-            <option value="">Choose semester</option>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-          </select>
-        </label>
-
-        <label>PDF link
-          <input id="noteUrl" type="url" required
-                 placeholder="https://drive.google.com/...">
-          <span class="help-text">Use a valid PDF URL. Restricted Drive files still require Google Drive permission for each approved student.</span>
-        </label>
-
-        <button type="submit" class="full-button">Add PDF to library</button>
-      </form>
-
-      <p id="noteAdminMessage" class="message" role="status"></p>
-      <h3 class="admin-subheading">Manage existing PDFs</h3>
-      <div id="adminNotes"><p>Loading PDFs…</p></div>
-    </section>
-
-    <section id="materials" class="card hidden">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">STUDENT LIBRARY</span>
-          <h2>Study Notes Library</h2>
-          <p class="muted">Choose a semester to find notes and previous question papers.</p>
-        </div>
-      </div>
-
-      <div id="semesterFilters" class="semester-filters" aria-label="Filter by semester">
-        <button type="button" class="semester-button active" data-semester="all">All</button>
-        <button type="button" class="semester-button" data-semester="1">Semester 1</button>
-        <button type="button" class="semester-button" data-semester="2">Semester 2</button>
-        <button type="button" class="semester-button" data-semester="3">Semester 3</button>
-        <button type="button" class="semester-button" data-semester="4">Semester 4</button>
-        <button type="button" class="semester-button" data-semester="5">Semester 5</button>
-        <button type="button" class="semester-button" data-semester="6">Semester 6</button>
-      </div>
-
-      <div id="notesList"><p>Loading study PDFs…</p></div>
-    </section>
-  </main>
-
-  <footer>
-    <strong>Niru Study Notes</strong>
-    <span>© <span id="year"></span> • Learn Today, Succeed Tomorrow!</span>
-  </footer>
-
-  <script type="module" src="app.js"></script>
-</body>
-</html>
-```
+  <h3 class="admin-subheading">Manage existing PDFs</h3>
+  <div id="adminNotes">
+    <p>Loading PDFs…</p>
+  </div>
+</section>
