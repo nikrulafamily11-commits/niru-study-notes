@@ -908,3 +908,56 @@ footer strong {
     padding: 8px 10px;
   }
 }
+
+/* Student management status tabs */
+.student-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.student-status-tabs button {
+  flex: 1 1 100px;
+  padding: 12px 16px;
+  border: 1px solid #d8deea;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #25324b;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.student-status-tabs button:hover {
+  background: #edf3ff;
+}
+
+.student-status-tabs button.active {
+  background: #234fc7;
+  border-color: #234fc7;
+  color: #ffffff;
+}
+
+.student-status-tabs button:focus-visible {
+  outline: 3px solid #94b7ff;
+  outline-offset: 3px;
+}
+
+.admin-existing-heading {
+  margin-top: 24px;
+}
+
+@media (max-width: 480px) {
+  .student-status-tabs {
+    gap: 7px;
+  }
+
+  .student-status-tabs button {
+    flex-basis: 85px;
+    padding: 10px 6px;
+    font-size: 14px;
+  }
+}
+
