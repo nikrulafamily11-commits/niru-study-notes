@@ -1,53 +1,910 @@
-:root{--navy:#173b70;--blue:#2463b5;--blue2:#397be0;--page:#f3f7fd;--ink:#182f50;--muted:#63748b;--line:#dce6f3;--white:#fff;--green:#176b43;--red:#a12c2c}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial,sans-serif;background:radial-gradient(ellipse at top left,#e7f0ff 0,transparent 38%),var(--page);color:var(--ink);line-height:1.55}
-.site-header{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px max(24px,calc((100% - 1120px)/2));background:linear-gradient(125deg,#142f59,#2463b5 75%,#397be0);color:white}
-.brand{display:flex;align-items:center;gap:14px}.logo{display:grid;place-items:center;width:55px;height:55px;border:1.5px solid #ffffffb8;border-radius:17px;background:#ffffff18;font-size:1.2rem;font-weight:800;letter-spacing:.04em;box-shadow:inset 0 0 18px #ffffff14}
-h1,h2,h3,p{margin-top:0}h1{font-size:1.35rem;margin-bottom:2px;letter-spacing:-.025em}header p{margin:0;color:#e4edff;font-size:.9rem}header p span{padding:0 4px}.header-tag{font-size:.9rem;color:#e5edff}
-main{max-width:1120px;width:calc(100% - 32px);margin:28px auto 42px}
-.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:25px;margin-bottom:20px;box-shadow:0 12px 34px #173b700b}
-.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center;padding:clamp(24px,4vw,44px);background:linear-gradient(125deg,#fff,#f5f9ff)}
-.eyebrow{display:block;color:var(--blue);font-size:.72rem;font-weight:800;letter-spacing:.13em;margin-bottom:8px}.hero h2,.auth-intro h2{font-size:clamp(1.7rem,3.6vw,2.65rem);line-height:1.15;letter-spacing:-.045em;margin-bottom:14px}.hero-copy>p,.auth-intro>p{max-width:550px;color:var(--muted);margin-bottom:0}
-.quote-card{padding:22px 24px;border-radius:16px;background:linear-gradient(145deg,#173b70,#2463b5);color:white;box-shadow:0 12px 24px #173b7022}.quote-mark{font-size:2.7rem;line-height:.8;color:#a8cbff;font-family:Georgia,serif}.quote-card p{font-size:1.02rem;font-weight:650;margin:8px 0}.quote-card small{color:#d5e5ff}.quote-card hr{border:0;border-top:1px solid #ffffff38;margin:17px 0}.quote-card .education-quote{font-size:.9rem;font-weight:500}
-.status-card{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}.status-icon{display:grid;place-items:center;width:45px;height:45px;border-radius:14px;background:#e8f1ff;color:var(--blue);font-size:1.5rem}.status-card h2{font-size:1.1rem;margin-bottom:3px}.status-card p{margin-bottom:0;color:var(--muted)}.status-card .message{grid-column:1/-1}
-.message{background:#edf4ff;color:#234b7d;padding:12px 14px;border-radius:10px;overflow-wrap:anywhere;margin:12px 0 0;font-size:.94rem}.message.error{background:#fff0f0;color:var(--red)}.message.success{background:#e9f8ef;color:var(--green)}
-.auth-layout{display:grid;grid-template-columns:.75fr 1.25fr;gap:25px;align-items:start;padding:12px 0}.auth-intro{padding:25px 8px 20px 4px}.auth-intro h2{font-size:clamp(1.7rem,3vw,2.25rem)}.mini-points{display:grid;gap:11px;margin-top:25px;color:#355777;font-weight:650;font-size:.92rem}.mini-points span::first-letter{color:var(--green)}
-.auth-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-card{padding:22px;margin:0}.form-card h2{font-size:1.2rem;margin-bottom:3px}.muted,.help-text{color:var(--muted)}.muted{font-size:.93rem;margin-bottom:16px}.label-hint{font-size:.78rem;font-weight:400;color:var(--muted)}
-label{display:block;font-weight:700;font-size:.9rem;margin:14px 0;color:#2c4261}input,select{display:block;width:100%;padding:12px 13px;margin-top:6px;border:1px solid #c7d5e7;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-weight:400;outline:none;min-width:0}input:focus,select:focus{border-color:var(--blue2);box-shadow:0 0 0 3px #397be01a}
-button{background:linear-gradient(120deg,var(--blue),var(--blue2));color:white;border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:750;cursor:pointer;transition:transform .15s,opacity .15s}button:hover{filter:brightness(1.04)}button:active{transform:translateY(1px)}button:disabled{opacity:.55;cursor:wait}.full-button{width:100%;margin-top:10px;min-height:44px}.secondary{background:#eaf1fb;color:var(--navy);box-shadow:none}.hidden{display:none!important}
-.account-heading,.section-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.account-heading h2,.section-heading h2{margin-bottom:2px}.account-heading .muted,.section-heading .muted{margin-bottom:0}.account-heading>button{flex-shrink:0}
-.count-line{font-size:.88rem;color:var(--muted);margin:18px 0 4px}.user-row,.note-admin-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-top:1px solid var(--line)}.user-info{min-width:0}.user-info strong{display:block;overflow-wrap:anywhere}.user-info span{display:block;color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}.pill{display:inline-block!important;width:max-content;background:#fff0d4;color:#815000!important;padding:3px 9px;border-radius:30px;font-size:.77rem!important;margin-top:6px}.pill.approved{background:#e2f6e9;color:var(--green)!important}.pill.rejected{background:#fff0f0;color:var(--red)!important}.user-actions{display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}.user-actions button{margin:0;padding:8px 11px;font-size:.85rem}.danger{background:#fff0f0;color:var(--red)}
-.section-rule{border:0;border-top:1px solid var(--line);margin:28px 0}.note-form{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}.note-form label:nth-child(3),.note-form button{grid-column:1/-1}.help-text{display:block;font-size:.8rem;font-weight:400;margin-top:6px}.admin-subheading{margin:25px 0 8px}.note-admin-row .note-row-info{min-width:0}.note-admin-row strong{display:block;overflow-wrap:anywhere}.note-admin-row small{color:var(--muted)}.note-admin-row a,.pdf-link{color:var(--blue);font-weight:700;text-decoration:none}.note-admin-row a:hover,.pdf-link:hover{text-decoration:underline}
-.semester-filters{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.semester-button{background:#edf3fc;color:#365373;border:1px solid #d9e4f2;padding:9px 13px;font-size:.88rem}.semester-button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.pdf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.pdf-card{display:flex;align-items:center;gap:14px;padding:17px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#fff,#f9fbff);min-width:0}.pdf-icon{display:grid;place-items:center;flex-shrink:0;width:44px;height:48px;border-radius:11px;background:#eaf1ff;color:var(--blue);font-size:.76rem;font-weight:900}.pdf-info{min-width:0;flex:1}.pdf-info h3{font-size:1rem;margin:0 0 4px;overflow-wrap:anywhere}.pdf-info p{font-size:.83rem;color:var(--muted);margin:0}.pdf-link{display:inline-block;margin-top:8px;font-size:.9rem}.empty-state{padding:22px;border:1px dashed #cbd9eb;border-radius:12px;color:var(--muted);text-align:center}
-footer{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;color:var(--muted);padding:22px;font-size:.88rem}footer strong{color:var(--navy)}
-@media(max-width:900px){.auth-layout{grid-template-columns:1fr;gap:8px}.auth-intro{padding:12px 4px}.mini-points{grid-template-columns:repeat(3,1fr);font-size:.82rem}.auth-cards{grid-template-columns:1fr 1fr}}
-@media(max-width:680px){.site-header{padding:18px 16px}.header-tag{display:none}main{width:calc(100% - 22px);margin:14px auto 28px}.card{padding:18px;border-radius:16px}.hero{grid-template-columns:1fr;gap:20px;padding:22px}.hero h2{font-size:1.9rem}.status-card{grid-template-columns:auto 1fr;gap:10px}.auth-cards{grid-template-columns:1fr}.auth-intro h2{font-size:1.8rem}.mini-points{grid-template-columns:1fr;gap:7px}.account-heading,.section-heading{align-items:flex-start;flex-direction:column}.account-heading>button{align-self:flex-start}.user-row,.note-admin-row{align-items:flex-start;flex-direction:column}.user-actions{width:100%}.user-actions button{flex:1}.note-form{grid-template-columns:1fr}.note-form label,.note-form button{grid-column:1}.pdf-grid{grid-template-columns:1fr}.semester-filters{gap:6px}.semester-button{padding:8px 10px;font-size:.82rem}}
 
-/* Logo, login music and password visibility controls */
-.logo-image{display:block;width:62px;height:62px;object-fit:cover;border-radius:15px;border:1px solid #ffffffa8;box-shadow:0 5px 16px #0002}
-.music-card{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(120deg,#fff,#edf4ff)}
-.music-card strong{color:var(--navy)}.music-card p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
-.music-card audio{width:min(100%,380px);height:42px}
-.password-wrap{display:flex;align-items:stretch;gap:7px;margin-top:6px}
-.password-wrap input{margin-top:0;flex:1;min-width:0}
-.toggle-password{background:#eaf1fb;color:var(--navy);padding:8px 12px;border:1px solid #d5e1f0;font-size:.82rem}
-@media(max-width:680px){.music-card{align-items:flex-start;flex-direction:column}.music-card audio{width:100%}.logo-image{width:52px;height:52px}}
+:root {
+  --navy: #173b70;
+  --blue: #2463b5;
+  --blue2: #397be0;
+  --page: #f3f7fd;
+  --ink: #182f50;
+  --muted: #63748b;
+  --line: #dce6f3;
+  --white: #fff;
+  --green: #176b43;
+  --red: #a12c2c;
+}
 
-/* Nature image replacing the left-side motivational text beside the login forms */
-.auth-nature{padding:0;min-width:0;align-self:stretch;display:flex;align-items:stretch}
-.nature-image{display:block;width:100%;height:100%;min-height:370px;max-height:560px;object-fit:cover;object-position:center;border-radius:18px;border:1px solid #dce6f3;box-shadow:0 12px 30px #173b7018}
-@media(max-width:900px){.auth-nature{padding:0}.nature-image{height:300px;min-height:260px;max-height:360px}}
-@media(max-width:680px){.nature-image{height:230px;min-height:230px;border-radius:14px}}
+* {
+  box-sizing: border-box;
+}
 
+html {
+  scroll-behavior: smooth;
+}
 
-/* Updated hero image and single-form login/register flow */
-.hero-nature{min-width:0;align-self:stretch;display:flex;align-items:stretch;padding:0}
-.hero-nature-image{display:block;width:100%;height:100%;min-height:280px;max-height:420px;object-fit:cover;object-position:center;border-radius:16px;border:1px solid var(--line);box-shadow:0 12px 30px #173b7018}
-.auth-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;max-width:520px;width:100%;margin-inline:auto}
-.form-card{width:100%}
-.switch-form{text-align:center;margin:18px 0 0;color:var(--muted);font-size:.92rem}
-.text-button{display:inline;background:transparent;color:var(--blue);box-shadow:none;padding:3px 5px;text-decoration:underline;font-weight:750}
-.text-button:hover{background:#edf4ff;filter:none}
-@media(max-width:900px){.hero-nature-image{min-height:240px;max-height:340px}}
-@media(max-width:680px){.hero-nature-image{min-height:210px;height:230px;border-radius:14px}.auth-cards{grid-template-columns:minmax(0,1fr)}}
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(ellipse at top left, #e7f0ff 0, transparent 38%),
+    var(--page);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+img {
+  max-width: 100%;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 22px max(24px, calc((100% - 1120px) / 2));
+  background: linear-gradient(125deg, #142f59, #2463b5 75%, #397be0);
+  color: white;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.logo-image {
+  display: block;
+  width: 62px;
+  height: 62px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 15px;
+  border: 1px solid #ffffffa8;
+  box-shadow: 0 5px 16px #0002;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 1.35rem;
+  margin-bottom: 2px;
+  letter-spacing: -0.025em;
+}
+
+header p {
+  margin: 0;
+  color: #e4edff;
+  font-size: 0.9rem;
+}
+
+header p span {
+  padding: 0 4px;
+}
+
+.header-tag {
+  font-size: 0.9rem;
+  color: #e5edff;
+}
+
+main {
+  max-width: 1120px;
+  width: calc(100% - 32px);
+  margin: 28px auto 42px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 34px #173b700b;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Hero and nature image */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: center;
+  padding: clamp(24px, 4vw, 44px);
+  background: linear-gradient(125deg, #fff, #f5f9ff);
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.hero-nature {
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+}
+
+.hero-nature-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  max-height: 420px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 30px #173b7018;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  margin-bottom: 8px;
+}
+
+/* Motivational quotes */
+
+.quote-card {
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #173b70, #2463b5);
+  color: white;
+  box-shadow: 0 12px 24px #173b7022;
+}
+
+.quote-mark {
+  font-size: 2.7rem;
+  line-height: 0.8;
+  color: #a8cbff;
+  font-family: Georgia, serif;
+}
+
+.quote-card p {
+  font-size: 1.02rem;
+  font-weight: 650;
+  margin: 8px 0;
+}
+
+.quote-card small {
+  color: #d5e5ff;
+}
+
+.quote-card hr {
+  border: 0;
+  border-top: 1px solid #ffffff38;
+  margin: 17px 0;
+}
+
+.quote-card .education-quote {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Music player */
+
+.music-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: linear-gradient(120deg, #fff, #edf4ff);
+}
+
+.music-card strong {
+  color: var(--navy);
+}
+
+.music-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.music-card audio {
+  width: min(100%, 380px);
+  height: 42px;
+}
+
+/* Welcome and messages */
+
+.status-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.status-icon {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 14px;
+  background: #e8f1ff;
+  color: var(--blue);
+  font-size: 1.5rem;
+}
+
+.status-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 3px;
+}
+
+.status-card p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.status-card .message {
+  grid-column: 1 / -1;
+}
+
+.message {
+  background: #edf4ff;
+  color: #234b7d;
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  margin: 12px 0 0;
+  font-size: 0.94rem;
+}
+
+.message:empty {
+  display: none;
+}
+
+.message.error {
+  background: #fff0f0;
+  color: var(--red);
+}
+
+.message.success {
+  background: #e9f8ef;
+  color: var(--green);
+}
+
+/* Login and registration */
+
+.auth-layout {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 25px;
+  align-items: start;
+  padding: 12px 0;
+}
+
+.auth-intro {
+  padding: 25px 8px 20px 4px;
+}
+
+.auth-intro h2 {
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+}
+
+.auth-intro > p {
+  max-width: 550px;
+  color: var(--muted);
+}
+
+.mini-points {
+  display: grid;
+  gap: 11px;
+  margin-top: 25px;
+  color: #355777;
+  font-weight: 650;
+  font-size: 0.92rem;
+}
+
+.mini-points span::first-letter {
+  color: var(--green);
+}
+
+.auth-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  max-width: 520px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.form-card {
+  padding: 22px;
+  margin: 0;
+  width: 100%;
+}
+
+.form-card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 3px;
+}
+
+.muted,
+.help-text {
+  color: var(--muted);
+}
+
+.muted {
+  font-size: 0.93rem;
+  margin-bottom: 16px;
+}
+
+.label-hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 14px 0;
+  color: #2c4261;
+}
+
+input,
+select {
+  display: block;
+  width: 100%;
+  padding: 12px 13px;
+  margin-top: 6px;
+  border: 1px solid #c7d5e7;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+  outline: none;
+  min-width: 0;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--blue2);
+  box-shadow: 0 0 0 3px #397be01a;
+}
+
+button {
+  background: linear-gradient(120deg, var(--blue), var(--blue2));
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+button:hover {
+  filter: brightness(1.04);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.full-button {
+  width: 100%;
+  margin-top: 10px;
+  min-height: 44px;
+}
+
+.secondary {
+  background: #eaf1fb;
+  color: var(--navy);
+  box-shadow: none;
+}
+
+.switch-form {
+  text-align: center;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.text-button {
+  display: inline;
+  background: transparent;
+  color: var(--blue);
+  box-shadow: none;
+  padding: 3px 5px;
+  text-decoration: underline;
+  font-weight: 750;
+}
+
+.text-button:hover {
+  background: #edf4ff;
+  filter: none;
+}
+
+/* Password visibility */
+
+.password-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.password-wrap input {
+  margin-top: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.toggle-password {
+  background: #eaf1fb;
+  color: var(--navy);
+  padding: 8px 12px;
+  border: 1px solid #d5e1f0;
+  font-size: 0.82rem;
+}
+
+/* Account and admin headings */
+
+.account-heading,
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.account-heading h2,
+.section-heading h2 {
+  margin-bottom: 2px;
+}
+
+.account-heading .muted,
+.section-heading .muted {
+  margin-bottom: 0;
+}
+
+.account-heading > button {
+  flex-shrink: 0;
+}
+
+/* Student management */
+
+.count-line {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+
+/* Pending, Approved and Rejected tabs */
+
+.student-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.student-status-tabs button {
+  background: #edf3fc;
+  color: var(--navy);
+  border: 1px solid var(--line);
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  box-shadow: none;
+}
+
+.student-status-tabs button.active,
+.student-status-tabs button[aria-pressed="true"] {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+}
+
+.student-status-tabs button:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #80b5ff;
+  outline-offset: 3px;
+}
+
+/* Student rows and status labels */
+
+.user-row,
+.note-admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.user-info {
+  min-width: 0;
+}
+
+.user-info strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.user-info span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.pill {
+  display: inline-block !important;
+  width: max-content;
+  background: #fff0d4;
+  color: #815000 !important;
+  padding: 3px 9px;
+  border-radius: 30px;
+  font-size: 0.77rem !important;
+  margin-top: 6px;
+}
+
+.pill.approved {
+  background: #e2f6e9;
+  color: var(--green) !important;
+}
+
+.pill.rejected {
+  background: #fff0f0;
+  color: var(--red) !important;
+}
+
+.user-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.user-actions button {
+  margin: 0;
+  padding: 8px 11px;
+  font-size: 0.85rem;
+}
+
+.danger {
+  background: #fff0f0;
+  color: var(--red);
+}
+
+.section-rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 28px 0;
+}
+
+/* Add and manage PDF resources */
+
+.note-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 18px;
+}
+
+.note-form label:nth-child(3),
+.note-form button {
+  grid-column: 1 / -1;
+}
+
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-top: 6px;
+}
+
+.admin-subheading {
+  margin: 25px 0 8px;
+}
+
+.note-admin-row .note-row-info {
+  min-width: 0;
+}
+
+.note-admin-row strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.note-admin-row small {
+  color: var(--muted);
+}
+
+.note-admin-row a,
+.pdf-link {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.note-admin-row a:hover,
+.pdf-link:hover {
+  text-decoration: underline;
+}
+
+/* Semester filters */
+
+.semester-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.semester-button {
+  background: #edf3fc;
+  color: #365373;
+  border: 1px solid #d9e4f2;
+  padding: 9px 13px;
+  font-size: 0.88rem;
+  box-shadow: none;
+}
+
+.semester-button.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+/* Study PDF cards */
+
+.pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.pdf-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff, #f9fbff);
+  min-width: 0;
+}
+
+.pdf-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 48px;
+  border-radius: 11px;
+  background: #eaf1ff;
+  color: var(--blue);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.pdf-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.pdf-info h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.pdf-info p {
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.pdf-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  padding: 22px;
+  border: 1px dashed #cbd9eb;
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Footer */
+
+footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-align: center;
+  color: var(--muted);
+  padding: 22px;
+  font-size: 0.88rem;
+}
+
+footer strong {
+  color: var(--navy);
+}
+
+/* Tablet layout */
+
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .auth-intro {
+    padding: 12px 4px;
+  }
+
+  .mini-points {
+    grid-template-columns: repeat(3, 1fr);
+    font-size: 0.82rem;
+  }
+
+  .hero-nature-image {
+    min-height: 240px;
+    max-height: 340px;
+  }
+}
+
+/* Mobile layout */
+
+@media (max-width: 680px) {
+  .site-header {
+    padding: 18px 16px;
+  }
+
+  .header-tag {
+    display: none;
+  }
+
+  .logo-image {
+    width: 52px;
+    height: 52px;
+  }
+
+  main {
+    width: calc(100% - 22px);
+    margin: 14px auto 28px;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px;
+  }
+
+  .hero-nature-image {
+    min-height: 210px;
+    height: 230px;
+    border-radius: 14px;
+  }
+
+  .quote-card {
+    padding: 20px;
+  }
+
+  .music-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .music-card audio {
+    width: 100%;
+  }
+
+  .status-card {
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+
+  .auth-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-intro h2 {
+    font-size: 1.8rem;
+  }
+
+  .mini-points {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .account-heading,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .account-heading > button {
+    align-self: flex-start;
+  }
+
+  .user-row,
+  .note-admin-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .user-actions {
+    width: 100%;
+  }
+
+  .user-actions button {
+    flex: 1;
+  }
+
+  .note-form {
+    grid-template-columns: 1fr;
+  }
+
+  .note-form label,
+  .note-form button {
+    grid-column: 1;
+  }
+
+  .pdf-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .semester-filters {
+    gap: 6px;
+  }
+
+  .semester-button {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .student-status-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .student-status-tabs button {
+    min-width: 0;
+    padding: 9px 4px;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+
+  .password-wrap {
+    gap: 6px;
+  }
+
+  .toggle-password {
+    padding: 8px 10px;
+  }
+}
