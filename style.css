@@ -23,3 +23,31 @@ button{background:linear-gradient(120deg,var(--blue),var(--blue2));color:white;b
 footer{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;color:var(--muted);padding:22px;font-size:.88rem}footer strong{color:var(--navy)}
 @media(max-width:900px){.auth-layout{grid-template-columns:1fr;gap:8px}.auth-intro{padding:12px 4px}.mini-points{grid-template-columns:repeat(3,1fr);font-size:.82rem}.auth-cards{grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.site-header{padding:18px 16px}.header-tag{display:none}main{width:calc(100% - 22px);margin:14px auto 28px}.card{padding:18px;border-radius:16px}.hero{grid-template-columns:1fr;gap:20px;padding:22px}.hero h2{font-size:1.9rem}.status-card{grid-template-columns:auto 1fr;gap:10px}.auth-cards{grid-template-columns:1fr}.auth-intro h2{font-size:1.8rem}.mini-points{grid-template-columns:1fr;gap:7px}.account-heading,.section-heading{align-items:flex-start;flex-direction:column}.account-heading>button{align-self:flex-start}.user-row,.note-admin-row{align-items:flex-start;flex-direction:column}.user-actions{width:100%}.user-actions button{flex:1}.note-form{grid-template-columns:1fr}.note-form label,.note-form button{grid-column:1}.pdf-grid{grid-template-columns:1fr}.semester-filters{gap:6px}.semester-button{padding:8px 10px;font-size:.82rem}}
+
+/* Logo, login music and password visibility controls */
+.logo-image{display:block;width:62px;height:62px;object-fit:cover;border-radius:15px;border:1px solid #ffffffa8;box-shadow:0 5px 16px #0002}
+.music-card{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(120deg,#fff,#edf4ff)}
+.music-card strong{color:var(--navy)}.music-card p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.music-card audio{width:min(100%,380px);height:42px}
+.password-wrap{display:flex;align-items:stretch;gap:7px;margin-top:6px}
+.password-wrap input{margin-top:0;flex:1;min-width:0}
+.toggle-password{background:#eaf1fb;color:var(--navy);padding:8px 12px;border:1px solid #d5e1f0;font-size:.82rem}
+@media(max-width:680px){.music-card{align-items:flex-start;flex-direction:column}.music-card audio{width:100%}.logo-image{width:52px;height:52px}}
+
+/* Nature image replacing the left-side motivational text beside the login forms */
+.auth-nature{padding:0;min-width:0;align-self:stretch;display:flex;align-items:stretch}
+.nature-image{display:block;width:100%;height:100%;min-height:370px;max-height:560px;object-fit:cover;object-position:center;border-radius:18px;border:1px solid #dce6f3;box-shadow:0 12px 30px #173b7018}
+@media(max-width:900px){.auth-nature{padding:0}.nature-image{height:300px;min-height:260px;max-height:360px}}
+@media(max-width:680px){.nature-image{height:230px;min-height:230px;border-radius:14px}}
+
+
+/* Updated hero image and single-form login/register flow */
+.hero-nature{min-width:0;align-self:stretch;display:flex;align-items:stretch;padding:0}
+.hero-nature-image{display:block;width:100%;height:100%;min-height:280px;max-height:420px;object-fit:cover;object-position:center;border-radius:16px;border:1px solid var(--line);box-shadow:0 12px 30px #173b7018}
+.auth-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;max-width:520px;width:100%;margin-inline:auto}
+.form-card{width:100%}
+.switch-form{text-align:center;margin:18px 0 0;color:var(--muted);font-size:.92rem}
+.text-button{display:inline;background:transparent;color:var(--blue);box-shadow:none;padding:3px 5px;text-decoration:underline;font-weight:750}
+.text-button:hover{background:#edf4ff;filter:none}
+@media(max-width:900px){.hero-nature-image{min-height:240px;max-height:340px}}
+@media(max-width:680px){.hero-nature-image{min-height:210px;height:230px;border-radius:14px}.auth-cards{grid-template-columns:minmax(0,1fr)}}
