@@ -4,55 +4,84 @@
     <div>
       <span class="eyebrow">ADMINISTRATOR</span>
       <h2>Student management</h2>
-      <p class="muted">Review registrations and manage library resources.</p>
+      <p class="muted">
+        Review registrations and manage library resources.
+      </p>
     </div>
-    <button id="refresh" class="secondary" type="button">Refresh list</button>
+
+    <button id="refresh" class="secondary" type="button">
+      Refresh list
+    </button>
   </div>
 
   <div class="count-line">
-    <span id="count">Loading accounts…</span>
+    <span id="count" aria-live="polite">Loading accounts…</span>
   </div>
 
-  <!-- Student status tabs -->
-  <div class="student-status-tabs" role="group"
-       aria-label="Filter students by status">
-    <button type="button"
-            data-user-status="pending"
-            class="active"
-            aria-pressed="true">Pending</button>
+  <!-- Student status filter tabs -->
+  <div
+    class="student-status-tabs"
+    role="group"
+    aria-label="Filter students by status"
+  >
+    <button
+      type="button"
+      data-user-status="pending"
+      class="active"
+      aria-pressed="true"
+    >
+      Pending
+    </button>
 
-    <button type="button"
-            data-user-status="approved"
-            aria-pressed="false">Approved</button>
+    <button
+      type="button"
+      data-user-status="approved"
+      aria-pressed="false"
+    >
+      Approved
+    </button>
 
-    <button type="button"
-            data-user-status="rejected"
-            aria-pressed="false">Rejected</button>
+    <button
+      type="button"
+      data-user-status="rejected"
+      aria-pressed="false"
+    >
+      Rejected
+    </button>
   </div>
 
-  <!-- Selected student category -->
-  <div id="users" aria-live="polite">
+  <!-- JavaScript displays the selected category here -->
+  <div id="users" aria-live="polite" aria-busy="false">
     <p>Loading student accounts…</p>
   </div>
 
   <hr class="section-rule">
 
+  <!-- Add study material -->
   <div class="section-heading">
     <div>
       <span class="eyebrow">LIBRARY CONTENT</span>
       <h2>Add a PDF resource</h2>
-      <p class="muted">Add a title, semester and a link to the PDF.</p>
+      <p class="muted">
+        Add a title, semester and a link to the PDF.
+      </p>
     </div>
   </div>
 
   <form id="addNoteForm" class="note-form">
-    <label>PDF title
-      <input id="noteTitle" required maxlength="150"
-             placeholder="Example: Laws of Thermodynamics">
+    <label for="noteTitle">PDF title
+      <input
+        id="noteTitle"
+        name="noteTitle"
+        type="text"
+        required
+        maxlength="150"
+        placeholder="Example: Laws of Thermodynamics"
+      >
     </label>
 
-    <label>Semester
-      <select id="noteSemester" required>
+    <label for="noteSemester">Semester
+      <select id="noteSemester" name="noteSemester" required>
         <option value="">Choose semester</option>
         <option value="1">Semester 1</option>
         <option value="2">Semester 2</option>
@@ -63,21 +92,35 @@
       </select>
     </label>
 
-    <label>PDF link
-      <input id="noteUrl" type="url" required
-             placeholder="https://drive.google.com/...">
+    <label for="noteUrl">PDF link
+      <input
+        id="noteUrl"
+        name="noteUrl"
+        type="url"
+        required
+        placeholder="https://drive.google.com/..."
+      >
       <span class="help-text">
-        Use a valid PDF URL. Restricted Drive files still require Google Drive permission for each approved student.
+        Use a valid PDF URL. Restricted Drive files still require
+        Google Drive permission for each approved student.
       </span>
     </label>
 
-    <button type="submit" class="full-button">Add PDF to library</button>
+    <button type="submit" class="full-button">
+      Add PDF to library
+    </button>
   </form>
 
-  <p id="noteAdminMessage" class="message" role="status"></p>
+  <p
+    id="noteAdminMessage"
+    class="message"
+    role="status"
+    aria-live="polite"
+  ></p>
 
   <h3 class="admin-subheading">Manage existing PDFs</h3>
-  <div id="adminNotes">
+
+  <div id="adminNotes" aria-live="polite">
     <p>Loading PDFs…</p>
   </div>
 </section>
