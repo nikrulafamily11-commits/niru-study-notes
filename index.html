@@ -10,10 +10,10 @@
 <body>
   <header class="site-header">
     <div class="brand">
-      <div class="logo" aria-label="Niru Study Notes logo">NS</div>
+      <img class="logo-image" src="assets/niru-logo.png" alt="Niru Study Notes logo">
       <div>
         <h1>Niru Study Notes</h1>
-        <p>B.Sc. PCM <span>•</span> English <span>•</span> ಕನ್ನಡ</p>
+        <p>B.Sc. PCM <span>•</span> English</p>
       </div>
     </div>
     <div class="header-tag">Your learning journey starts here</div>
@@ -21,20 +21,23 @@
 
   <main>
     <section class="hero card">
-      <div class="hero-copy">
-        <span class="eyebrow">STUDY • GROW • SUCCEED</span>
-        <h2>Your next step toward success.</h2>
-        <p>A study space for B.Sc. Physics, Chemistry and Mathematics students. Register for free and wait for administrator approval to access the library.</p>
+      <div class="hero-copy hero-nature">
+        <img src="assets/nature-waterfall.png" alt="Peaceful waterfall, green forest, and sunrise over the mountains" class="hero-nature-image">
       </div>
       <div class="quote-card">
         <span class="quote-mark">“</span>
-        <p>My parents are my first teachers. Their sacrifices inspire my success.</p>
-        <small>— A reminder to keep going</small>
+        <p>“My biggest dream is not to become rich, but to make my parents smile with pride. 🥹❤️”</p>
+        <small>— A promise to my parents</small>
         <hr>
-        <p class="education-quote">“Education is the most powerful weapon which you can use to change the world.”</p>
-        <small>— Nelson Mandela</small>
+        <p class="education-quote">“A teacher is a lamp that lights the path from ignorance to knowledge. 🪔”</p>
+        <small>— Respect every teacher</small>
+        <hr>
+        <p class="education-quote">“Don't study only to pass an examination. Study to understand the world and create a better future. 🎯”</p>
+        <small>— Your future begins with learning</small>
       </div>
     </section>
+
+    <section class="card music-card"><div><strong>🎵 A little music for your learning journey</strong><p>Play or pause your login music whenever you like.</p></div><audio id="loginMusic" controls preload="metadata"><source src="assets/login-song.mpeg" type="audio/mpeg">Your browser does not support audio playback.</audio></section>
 
     <section class="card status-card">
       <div class="status-icon">✦</div>
@@ -46,27 +49,23 @@
     </section>
 
     <section id="auth" class="auth-layout">
-      <div class="auth-intro">
-        <span class="eyebrow">YOUR FUTURE IS WORTH IT</span>
-        <h2>Small steps today.<br>Big achievements tomorrow.</h2>
-        <p>Keep your learning organized with semester-wise notes and PDF resources.</p>
-        <div class="mini-points"><span>✓ Free student account</span><span>✓ Semester-wise PDFs</span><span>✓ Admin-reviewed access</span></div>
-      </div>
       <div class="auth-cards">
-        <form id="signup" class="card form-card">
-          <h2>Create your account</h2>
-          <p class="muted">New here? Register below.</p>
-          <label>Full name<input id="name" autocomplete="name" required maxlength="80" placeholder="Enter your full name"></label>
-          <label>Email address<input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-          <label>Password <span class="label-hint">(at least 6 characters)</span><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Create a password"></label>
-          <button type="submit" class="full-button">Create free account</button>
-        </form>
         <form id="login" class="card form-card">
           <h2>Welcome back</h2>
-          <p class="muted">Already registered? Sign in.</p>
+          <p class="muted">Sign in to your Niru Study Notes account.</p>
           <label>Email address<input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-          <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Enter your password"></label>
+          <label>Password<div class="password-wrap"><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Enter your password"><button class="toggle-password" type="button" data-password="loginPassword" aria-label="Show login password">Show</button></div></label>
           <button type="submit" class="full-button">Sign in to your account</button>
+          <p class="switch-form">Don't have an account? <button type="button" id="showSignup" class="text-button">Register</button></p>
+        </form>
+        <form id="signup" class="card form-card hidden">
+          <h2>Create your account</h2>
+          <p class="muted">Join Niru Study Notes for free.</p>
+          <label>Full name<input id="name" autocomplete="name" required maxlength="80" placeholder="Enter your full name"></label>
+          <label>Email address<input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+          <label>Password <span class="label-hint">(at least 6 characters)</span><div class="password-wrap"><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Create a password"><button class="toggle-password" type="button" data-password="signupPassword" aria-label="Show registration password">Show</button></div></label>
+          <button type="submit" class="full-button">Create free account</button>
+          <p class="switch-form">Already have an account? <button type="button" id="showLogin" class="text-button">Back to Login</button></p>
         </form>
       </div>
     </section>
