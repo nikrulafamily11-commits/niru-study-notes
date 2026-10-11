@@ -20,10 +20,6 @@ $("year").textContent = new Date().getFullYear();
 let activeSemester = "all";
 let currentProfile = null;
 
-// Student management panel settings
-let studentManagementOpen = false;
-let activeUserStatus = "pending";
-
 function message(text, type = "") {
   $("message").textContent = text;
   $("message").className = "message " + type;
@@ -100,52 +96,28 @@ $("refresh").addEventListener("click", async () => {
   await loadUsers();
   await loadAdminNotes();
 });
-
 $("addNoteForm").addEventListener("submit", async e => {
   e.preventDefault();
-
-  const form = e.currentTarget;
-  const btn = form.querySelector('button[type="submit"]');
-
   if (!isAdmin(auth.currentUser)) {
-    $("noteAdminMessage").textContent =
-      "Only the administrator can add PDFs.";
+    $("noteAdminMessage").textContent = "Only the administrator can add PDFs.";
     $("noteAdminMessage").className = "message error";
     return;
   }
-
+  const btn = e.currentTarget.querySelector('button[type="submit"]');
   btn.disabled = true;
-
   try {
     const title = $("noteTitle").value.trim();
     const semester = Number($("noteSemester").value);
     const url = safeUrl($("noteUrl").value.trim());
-
-    if (!url) {
-      throw new Error("Enter a valid http or https PDF link.");
-    }
-
-    if (!Number.isInteger(semester) || semester < 1 || semester > 6) {
-      throw new Error("Choose a semester from 1 to 6.");
-    }
-
+    if (!url) throw new Error("Enter a valid http or https PDF link.");
+    if (!Number.isInteger(semester) || semester < 1 || semester > 6) throw new Error("Choose a semester from 1 to 6.");
     await addDoc(collection(db, "notes"), {
-      title,
-      semester,
-      url,
-      createdAt: serverTimestamp(),
-      createdBy: auth.currentUser.uid
+      title, semester, url, createdAt: serverTimestamp(), createdBy: auth.currentUser.uid
     });
-
-    form.reset();
-
-    $("noteAdminMessage").textContent =
-      "PDF added to the study library.";
+    e.currentTarget.reset();
+    $("noteAdminMessage").textContent = "PDF added to the study library.";
     $("noteAdminMessage").className = "message success";
-
     await loadAdminNotes();
-    await loadStudentNotes();
-
   } catch (err) {
     $("noteAdminMessage").textContent = errorText(err);
     $("noteAdminMessage").className = "message error";
@@ -153,8 +125,6 @@ $("addNoteForm").addEventListener("submit", async e => {
     btn.disabled = false;
   }
 });
-
-
 
 $("semesterFilters").addEventListener("click", async e => {
   const btn = e.target.closest("button[data-semester]");
@@ -164,231 +134,63 @@ $("semesterFilters").addEventListener("click", async e => {
   await loadStudentNotes();
 });
 
-
 async function loadUsers() {
   if (!isAdmin(auth.currentUser)) {
     message("Only the configured administrator can see student accounts.", "error");
     return;
   }
-
   const root = $("users");
-  const parent = root.parentElement;
-
-  // Create the collapsible panel controls only once.
-  let toggle = $("studentManagementToggle");
-  let tabs = $("studentManagementTabs");
-
-  if (!toggle) {
-    toggle = document.createElement("button");
-    toggle.id = "studentManagementToggle";
-    toggle.type = "button";
-    toggle.className = "secondary";
-    toggle.style.width = "100%";
-    toggle.style.marginBottom = "12px";
-    toggle.textContent = "Student Management  +";
-    parent.insertBefore(toggle, root);
-
-    tabs = document.createElement("div");
-    tabs.id = "studentManagementTabs";
-    tabs.className = "hidden";
-    tabs.style.display = "flex";
-    tabs.style.flexWrap = "wrap";
-    tabs.style.gap = "8px";
-    tabs.style.marginBottom = "12px";
-    parent.insertBefore(tabs, root);
-
-    ["pending", "approved", "rejected"].forEach(status => {
-      const tab = document.createElement("button");
-      tab.type = "button";
-      tab.dataset.userStatus = status;
-      tab.className = "secondary";
-      tab.addEventListener("click", () => {
-        activeUserStatus = status;
-        loadUsers();
-      });
-      tabs.append(tab);
-    });
-
-    toggle.addEventListener("click", () => {
-      studentManagementOpen = !studentManagementOpen;
-      toggle.textContent = studentManagementOpen
-        ? "Student Management  −"
-        : "Student Management  +";
-
-      tabs.classList.toggle("hidden", !studentManagementOpen);
-      root.classList.toggle("hidden", !studentManagementOpen);
-
-      if (studentManagementOpen) {
-        loadUsers();
-      }
-    });
-
-    // Keep the student list collapsed when the page first loads.
-    root.classList.add("hidden");
-  }
-
   root.replaceChildren(document.createTextNode("Loading accounts…"));
-
   try {
-    const snap = await getDocs(
-      query(collection(db, "users"), orderBy("createdAt", "desc"))
-    );
-
-    const students = snap.docs.map(s => ({
-      id: s.id,
-      ...s.data()
-    }));
-
-    const statuses = ["pending", "approved", "rejected"];
-    const counts = {};
-
-    statuses.forEach(status => {
-      counts[status] = students.filter(u => {
-        const actual = ["pending", "approved", "rejected"].includes(u.status)
-          ? u.status
-          : "pending";
-        return actual === status;
-      }).length;
-    });
-
-    $("count").textContent = `${snap.size} account(s)`;
-
-    // Update tab labels and selected state.
-    tabs.querySelectorAll("button[data-user-status]").forEach(tab => {
-      const status = tab.dataset.userStatus;
-      const label = status.charAt(0).toUpperCase() + status.slice(1);
-
-      tab.textContent = `${label} (${counts[status]})`;
-      tab.className =
-        status === activeUserStatus ? "active" : "secondary";
-      tab.setAttribute(
-        "aria-pressed",
-        String(status === activeUserStatus)
-      );
-    });
-
+    const snap = await getDocs(query(collection(db, "users"), orderBy("createdAt", "desc")));
     root.replaceChildren();
-
-    if (snap.empty) {
-      root.append(makeEmpty("No student accounts yet."));
-      return;
-    }
-
-    if (!studentManagementOpen) {
-      return;
-    }
-
-    const filtered = students.filter(u => {
-      const status = ["pending", "approved", "rejected"].includes(u.status)
-        ? u.status
-        : "pending";
-      return status === activeUserStatus;
-    });
-
-    if (!filtered.length) {
-      root.append(
-        makeEmpty(`No ${activeUserStatus} student accounts.`)
-      );
-      return;
-    }
-
-    filtered.forEach(u => {
-      const row = document.createElement("div");
-      row.className = "user-row";
-
-      const info = document.createElement("div");
-      info.className = "user-info";
-
-      const name = document.createElement("strong");
-      name.textContent = u.name || "Student";
-
-      const email = document.createElement("span");
-      email.textContent = u.email || "";
-
-      const status = ["pending", "approved", "rejected"].includes(u.status)
-        ? u.status
-        : "pending";
-
+    $("count").textContent = `${snap.size} account(s)`;
+    if (snap.empty) { root.append(makeEmpty("No student accounts yet.")); return; }
+    snap.forEach(s => {
+      const u = s.data();
+      const row = document.createElement("div"); row.className = "user-row";
+      const info = document.createElement("div"); info.className = "user-info";
+      const name = document.createElement("strong"); name.textContent = u.name || "Student";
+      const email = document.createElement("span"); email.textContent = u.email || "";
       const state = document.createElement("span");
-      state.textContent =
-        status.charAt(0).toUpperCase() + status.slice(1);
-      state.className =
-        "pill " +
-        (status === "approved"
-          ? "approved"
-          : status === "rejected"
-            ? "rejected"
-            : "");
-
+      const status = ["approved", "rejected", "pending"].includes(u.status) ? u.status : "pending";
+      state.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      state.className = "pill " + (status === "approved" ? "approved" : status === "rejected" ? "rejected" : "");
       info.append(name, email, state);
-
-      const actions = document.createElement("div");
-      actions.className = "user-actions";
-
+      const actions = document.createElement("div"); actions.className = "user-actions";
       const approve = document.createElement("button");
-      approve.textContent =
-        status === "approved" ? "Revoke access" : "Approve";
+      approve.textContent = status === "approved" ? "Revoke access" : "Approve";
       approve.className = status === "approved" ? "secondary" : "";
-
       approve.addEventListener("click", async () => {
         approve.disabled = true;
-
         try {
-          const next =
-            status === "approved" ? "pending" : "approved";
-
-          await updateDoc(doc(db, "users", u.id), {
-            status: next,
-            reviewedAt: serverTimestamp(),
-            reviewedBy: auth.currentUser.uid
-          });
-
+          const next = status === "approved" ? "pending" : "approved";
+          await updateDoc(doc(db, "users", s.id), { status: next, reviewedAt: serverTimestamp(), reviewedBy: auth.currentUser.uid });
           message(`${u.name || u.email}: ${next}.`, "success");
           await loadUsers();
-          await loadStudentNotes();
-        } catch (err) {
-          message(errorText(err), "error");
-          approve.disabled = false;
-        }
+        } catch (err) { message(errorText(err), "error"); approve.disabled = false; }
       });
-
       const reject = document.createElement("button");
       reject.textContent = "Reject";
       reject.className = "danger";
       reject.disabled = status === "rejected";
-
       reject.addEventListener("click", async () => {
         reject.disabled = true;
-
         try {
-          await updateDoc(doc(db, "users", u.id), {
-            status: "rejected",
-            reviewedAt: serverTimestamp(),
-            reviewedBy: auth.currentUser.uid
-          });
-
+          await updateDoc(doc(db, "users", s.id), { status: "rejected", reviewedAt: serverTimestamp(), reviewedBy: auth.currentUser.uid });
           message(`${u.name || u.email}: rejected.`, "success");
           await loadUsers();
-          await loadStudentNotes();
-        } catch (err) {
-          message(errorText(err), "error");
-          reject.disabled = false;
-        }
+        } catch (err) { message(errorText(err), "error"); reject.disabled = false; }
       });
-
       actions.append(approve, reject);
       row.append(info, actions);
       root.append(row);
     });
   } catch (e) {
-    root.replaceChildren(
-      makeEmpty("Could not load accounts. Check your Firestore security rules.")
-    );
+    root.replaceChildren(makeEmpty("Could not load accounts. Check your Firestore security rules."));
     message(errorText(e), "error");
   }
 }
-
-
 
 function buildPdfCard(note) {
   const card = document.createElement("article"); card.className = "pdf-card";
@@ -517,3 +319,33 @@ async function render(user) {
   }
 }
 onAuthStateChanged(auth, user => render(user).catch(e => message(errorText(e), "error")));
+
+// Accessible show/hide controls for both password fields.
+document.querySelectorAll("[data-password]").forEach(button => {
+  button.addEventListener("click", () => {
+    const field = document.getElementById(button.dataset.password);
+    const showing = field.type === "password";
+    field.type = showing ? "text" : "password";
+    button.textContent = showing ? "Hide" : "Show";
+    button.setAttribute("aria-label", `${showing ? "Hide" : "Show"} ${button.dataset.password === "signupPassword" ? "registration" : "login"} password`);
+  });
+});
+
+
+// Switch between the login and registration forms without changing Firebase logic.
+const showSignupButton = $("showSignup");
+const showLoginButton = $("showLogin");
+const loginForm = $("login");
+const signupForm = $("signup");
+showSignupButton?.addEventListener("click", () => {
+  loginForm.classList.add("hidden");
+  signupForm.classList.remove("hidden");
+  $("message").textContent = "Create your free student account.";
+  $("message").className = "message";
+});
+showLoginButton?.addEventListener("click", () => {
+  signupForm.classList.add("hidden");
+  loginForm.classList.remove("hidden");
+  $("message").textContent = "Not signed in.";
+  $("message").className = "message";
+});
