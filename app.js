@@ -701,6 +701,21 @@ async function render(user) {
   }
 }
 
+
 onAuthStateChanged(auth, user =>
   render(user).catch(e => message(errorText(e), "error"))
 );
+
+/* ADDITION: Login Time option */
+const loginTimeButton = document.getElementById("loginTimeButton");
+
+if (loginTimeButton) {
+  loginTimeButton.addEventListener("click", () => {
+    if (!isAdmin(auth.currentUser)) {
+      message("Administrator access required.", "error");
+      return;
+    }
+
+    window.open("./login-history.html", "_blank", "noopener");
+  });
+}
