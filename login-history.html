@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login History | Niru Study Notes</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #f1f5fb;
+      color: #1b2b49;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(20, 50, 90, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #1456c5;
+    }
+
+    .notice {
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    button, .back-link {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    button {
+      background: #1456d9;
+      color: white;
+    }
+
+    .back-link {
+      background: #eaf1ff;
+      color: #1456c5;
+    }
+
+    #status {
+      margin: 16px 0;
+      color: #64748b;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      overflow-wrap: anywhere;
+    }
+
+    th {
+      background: #f5f8ff;
+      color: #334155;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      .container {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Student Login History</h1>
+
+    <p class="notice">
+      This page is for the Niru Study Notes administrator.
+      It displays login records saved in Firebase.
+    </p>
+
+    <div class="actions">
+      <a class="back-link" href="./index.html">Back to website</a>
+      <button id="refreshButton" type="button">Refresh history</button>
+    </div>
+
+    <p id="status">Checking administrator access…</p>
+
+    <div id="historyArea" class="hidden">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Login date and time</th>
+              <th>User ID</th>
+            </tr>
+          </thead>
+          <tbody id="historyRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    // Use the same Firebase project as your existing website.
+    const firebaseConfig = {
+      apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
+      authDomain: "niru-study-portal.firebaseapp.com",
+      projectId: "niru-study-portal",
+      storageBucket: "niru-study-portal.firebasestorage.app",
+      messagingSenderId: "476816671743",
+      appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
+    };
+
+    // Must match the administrator UID used by your existing app.js.
+    const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const statusText = document.getElementById("status");
+    const historyArea = document.getElementById("historyArea");
+    const historyRows = document.getElementById("historyRows");
+    const refreshButton = document.getElementById("refreshButton");
+
+    let adminIsSignedIn = false;
+
+    function showStatus(text) {
+      statusText.textContent = text;
+    }
+
+    function formatLoginTime(value) {
+      if (!value || typeof value.toDate !== "function") {
+        return "Time not available";
+      }
+
+      return value.toDate().toLocaleString();
+    }
+
+    async function loadHistory() {
+      if (!adminIsSignedIn) {
+        showStatus("Administrator access required.");
+        return;
+      }
+
+      refreshButton.disabled = true;
+      showStatus("Loading login records…");
+      historyRows.replaceChildren();
+
+      try {
+        const historyQuery = query(
+          collection(db, "loginHistory"),
+          orderBy("loginAt", "desc")
+        );
+
+        const snapshot = await getDocs(historyQuery);
+
+        if (snapshot.empty) {
+          showStatus(
+            "No login records yet. The website must record successful sign-ins first."
+          );
+          historyArea.classList.add("hidden");
+          return;
+        }
+
+        snapshot.forEach(documentSnapshot => {
+          const record = documentSnapshot.data();
+
+          const row = document.createElement("tr");
+          const timeCell = document.createElement("td");
+          const userCell = document.createElement("td");
+
+          timeCell.textContent = formatLoginTime(record.loginAt);
+          userCell.textContent = record.userId || "User ID unavailable";
+
+          row.append(timeCell, userCell);
+          historyRows.append(row);
+        });
+
+        historyArea.classList.remove("hidden");
+        showStatus(`Loaded ${snapshot.size} login record(s).`);
+      } catch (error) {
+        console.error(error);
+        showStatus(
+          "Could not load records. Check that loginHistory exists and Firestore Rules allow the admin to read it."
+        );
+      } finally {
+        refreshButton.disabled = false;
+      }
+    }
+
+    refreshButton.addEventListener("click", loadHistory);
+
+    onAuthStateChanged(auth, user => {
+      if (!user || user.uid !== ADMIN_UID) {
+        adminIsSignedIn = false;
+        historyArea.classList.add("hidden");
+        showStatus("Admin sign-in required. Return to the website and sign in as the administrator.");
+        return;
+      }
+
+      adminIsSignedIn = true;
+      loadHistory();
+    });
+  </script>
+</body>
+</html>
