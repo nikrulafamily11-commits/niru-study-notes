@@ -32,10 +32,9 @@ import {
   serverTimestamp as rtdbServerTimestamp
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
-// ========================================
-// FIREBASE CONFIGURATION
-// ========================================
 
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
   authDomain: "niru-study-portal.firebaseapp.com",
