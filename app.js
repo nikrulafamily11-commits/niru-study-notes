@@ -1,5 +1,6 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -23,6 +24,7 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
   authDomain: "niru-study-portal.firebaseapp.com",
@@ -32,11 +34,14 @@ const firebaseConfig = {
   appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
 };
 
+// Administrator UID
 const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 const $ = id => document.getElementById(id);
 
 $("year").textContent = new Date().getFullYear();
@@ -45,23 +50,30 @@ let activeSemester = "all";
 let activeUserStatus = "pending";
 let currentProfile = null;
 
+// Display messages
 function message(text, type = "") {
   $("message").textContent = text;
   $("message").className = "message " + type;
 }
 
+// Convert Firebase errors into readable messages
 function errorText(e) {
   const known = {
     "auth/email-already-in-use":
       "This email already has an account. Please sign in.",
+
     "auth/invalid-email":
       "Enter a valid email address.",
+
     "auth/weak-password":
       "Use a password with at least 6 characters.",
+
     "auth/invalid-credential":
       "Email or password is incorrect.",
+
     "auth/operation-not-allowed":
       "Enable Email/Password in Firebase Authentication.",
+
     "permission-denied":
       "Permission denied. Check Firestore rules and confirm the administrator UID."
   };
@@ -69,12 +81,15 @@ function errorText(e) {
   return known[e.code] || e.message || "Something went wrong.";
 }
 
+// Show or hide an HTML element
 const visible = (id, on) =>
   $(id).classList.toggle("hidden", !on);
 
+// Verify administrator identity
 const isAdmin = user =>
   !!user && user.uid === ADMIN_UID;
 
+// Create empty-state messages safely
 function makeEmpty(text) {
   const p = document.createElement("p");
   p.className = "empty-state";
@@ -82,9 +97,11 @@ function makeEmpty(text) {
   return p;
 }
 
+// Accept only HTTP and HTTPS links
 function safeUrl(raw) {
   try {
     const u = new URL(raw);
+
     return u.protocol === "https:" || u.protocol === "http:"
       ? u.href
       : null;
@@ -93,12 +110,16 @@ function safeUrl(raw) {
   }
 }
 
-// Student registration
+// ========================================
+// STUDENT REGISTRATION
+// ========================================
+
 $("signup").addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
   const btn = form.querySelector('button[type="submit"]');
+
   btn.disabled = true;
 
   try {
@@ -120,6 +141,7 @@ $("signup").addEventListener("submit", async e => {
     });
 
     form.reset();
+
     message(
       "Account created. Your account is waiting for administrator approval.",
       "success"
@@ -131,11 +153,15 @@ $("signup").addEventListener("submit", async e => {
   }
 });
 
-// Login
+// ========================================
+// STUDENT LOGIN
+// ========================================
+
 $("login").addEventListener("submit", async e => {
   e.preventDefault();
 
   const btn = e.currentTarget.querySelector('button[type="submit"]');
+
   btn.disabled = true;
 
   try {
@@ -146,6 +172,7 @@ $("login").addEventListener("submit", async e => {
     );
 
     $("login").reset();
+
     message("Signed in successfully.", "success");
   } catch (err) {
     message(errorText(err), "error");
@@ -154,7 +181,10 @@ $("login").addEventListener("submit", async e => {
   }
 });
 
-// Logout
+// ========================================
+// LOGOUT
+// ========================================
+
 $("logout").addEventListener("click", async () => {
   try {
     await signOut(auth);
@@ -164,19 +194,36 @@ $("logout").addEventListener("click", async () => {
   }
 });
 
-// Refresh admin lists
+// ========================================
+// ADMIN REFRESH
+// ========================================
+
 $("refresh").addEventListener("click", async () => {
+  if (!isAdmin(auth.currentUser)) {
+    message("Administrator access required.", "error");
+    return;
+  }
+
   await loadUsers();
   await loadAdminNotes();
 });
 
-// Student status tabs
+// ========================================
+// STUDENT STATUS TABS
+// ========================================
+
 document.querySelectorAll("[data-user-status]").forEach(button => {
   button.addEventListener("click", async () => {
+    if (!isAdmin(auth.currentUser)) {
+      message("Administrator access required.", "error");
+      return;
+    }
+
     activeUserStatus = button.dataset.userStatus;
 
     document.querySelectorAll("[data-user-status]").forEach(tab => {
       tab.classList.toggle("active", tab === button);
+
       tab.setAttribute(
         "aria-pressed",
         tab === button ? "true" : "false"
@@ -187,7 +234,10 @@ document.querySelectorAll("[data-user-status]").forEach(button => {
   });
 });
 
-// Add a study PDF
+// ========================================
+// ADD A STUDY PDF
+// ========================================
+
 $("addNoteForm").addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -197,6 +247,7 @@ $("addNoteForm").addEventListener("submit", async e => {
   if (!isAdmin(auth.currentUser)) {
     $("noteAdminMessage").textContent =
       "Only the administrator can add PDFs.";
+
     $("noteAdminMessage").className = "message error";
     return;
   }
@@ -228,6 +279,7 @@ $("addNoteForm").addEventListener("submit", async e => {
 
     $("noteAdminMessage").textContent =
       "PDF added to the study library.";
+
     $("noteAdminMessage").className = "message success";
 
     await loadAdminNotes();
@@ -240,9 +292,13 @@ $("addNoteForm").addEventListener("submit", async e => {
   }
 });
 
-// Semester filters
+// ========================================
+// SEMESTER FILTERS
+// ========================================
+
 $("semesterFilters").addEventListener("click", async e => {
   const btn = e.target.closest("button[data-semester]");
+
   if (!btn) return;
 
   activeSemester = btn.dataset.semester;
@@ -254,7 +310,10 @@ $("semesterFilters").addEventListener("click", async e => {
   await loadStudentNotes();
 });
 
-// Student management: show only the selected status
+// ========================================
+// ADMIN: LOAD AND MANAGE STUDENTS
+// ========================================
+
 async function loadUsers() {
   if (!isAdmin(auth.currentUser)) {
     message(
@@ -265,11 +324,17 @@ async function loadUsers() {
   }
 
   const root = $("users");
-  root.replaceChildren(document.createTextNode("Loading accounts…"));
+
+  root.replaceChildren(
+    document.createTextNode("Loading accounts…")
+  );
 
   try {
     const snap = await getDocs(
-      query(collection(db, "users"), orderBy("createdAt", "desc"))
+      query(
+        collection(db, "users"),
+        orderBy("createdAt", "desc")
+      )
     );
 
     const students = snap.docs.map(s => {
@@ -290,14 +355,21 @@ async function loadUsers() {
       rejected: students.filter(u => u.status === "rejected").length
     };
 
-    // Display counts on the three tabs
+    // Update tab labels and counts
     document.querySelectorAll("[data-user-status]").forEach(button => {
       const status = button.dataset.userStatus;
 
       if (Object.hasOwn(counts, status)) {
-        const label = status.charAt(0).toUpperCase() + status.slice(1);
+        const label =
+          status.charAt(0).toUpperCase() + status.slice(1);
+
         button.textContent = `${label} (${counts[status]})`;
-        button.classList.toggle("active", status === activeUserStatus);
+
+        button.classList.toggle(
+          "active",
+          status === activeUserStatus
+        );
+
         button.setAttribute(
           "aria-pressed",
           status === activeUserStatus ? "true" : "false"
@@ -339,6 +411,7 @@ async function loadUsers() {
       email.textContent = u.email || "";
 
       const state = document.createElement("span");
+
       state.textContent =
         u.status.charAt(0).toUpperCase() + u.status.slice(1);
 
@@ -355,7 +428,7 @@ async function loadUsers() {
       const actions = document.createElement("div");
       actions.className = "user-actions";
 
-      // Approve a student or revoke approved access
+      // Approve or revoke access
       if (u.status !== "rejected") {
         const approve = document.createElement("button");
 
@@ -366,6 +439,11 @@ async function loadUsers() {
           u.status === "approved" ? "secondary" : "";
 
         approve.addEventListener("click", async () => {
+          if (!isAdmin(auth.currentUser)) {
+            message("Administrator access required.", "error");
+            return;
+          }
+
           approve.disabled = true;
 
           try {
@@ -379,7 +457,12 @@ async function loadUsers() {
             });
 
             activeUserStatus = next;
-            message(`${u.name || u.email}: ${next}.`, "success");
+
+            message(
+              `${u.name || u.email}: ${next}.`,
+              "success"
+            );
+
             await loadUsers();
           } catch (err) {
             message(errorText(err), "error");
@@ -390,13 +473,19 @@ async function loadUsers() {
         actions.append(approve);
       }
 
-      // Reject a student or move a rejected student back to pending
+      // Reject a student
       if (u.status !== "rejected") {
         const reject = document.createElement("button");
+
         reject.textContent = "Reject";
         reject.className = "danger";
 
         reject.addEventListener("click", async () => {
+          if (!isAdmin(auth.currentUser)) {
+            message("Administrator access required.", "error");
+            return;
+          }
+
           reject.disabled = true;
 
           try {
@@ -407,7 +496,12 @@ async function loadUsers() {
             });
 
             activeUserStatus = "rejected";
-            message(`${u.name || u.email}: rejected.`, "success");
+
+            message(
+              `${u.name || u.email}: rejected.`,
+              "success"
+            );
+
             await loadUsers();
           } catch (err) {
             message(errorText(err), "error");
@@ -417,11 +511,18 @@ async function loadUsers() {
 
         actions.append(reject);
       } else {
+        // Restore rejected student to pending
         const restore = document.createElement("button");
+
         restore.textContent = "Move to Pending";
         restore.className = "secondary";
 
         restore.addEventListener("click", async () => {
+          if (!isAdmin(auth.currentUser)) {
+            message("Administrator access required.", "error");
+            return;
+          }
+
           restore.disabled = true;
 
           try {
@@ -432,7 +533,12 @@ async function loadUsers() {
             });
 
             activeUserStatus = "pending";
-            message(`${u.name || u.email}: moved to pending.`, "success");
+
+            message(
+              `${u.name || u.email}: moved to pending.`,
+              "success"
+            );
+
             await loadUsers();
           } catch (err) {
             message(errorText(err), "error");
@@ -448,13 +554,19 @@ async function loadUsers() {
     });
   } catch (e) {
     root.replaceChildren(
-      makeEmpty("Could not load accounts. Check your Firestore security rules.")
+      makeEmpty(
+        "Could not load accounts. Check your Firestore security rules."
+      )
     );
+
     message(errorText(e), "error");
   }
 }
 
-// Build a PDF card for the student library
+// ========================================
+// BUILD A PDF CARD
+// ========================================
+
 function buildPdfCard(note) {
   const card = document.createElement("article");
   card.className = "pdf-card";
@@ -478,43 +590,70 @@ function buildPdfCard(note) {
 
   if (url) {
     const link = document.createElement("a");
+
     link.className = "pdf-link";
     link.href = url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     link.textContent = "Open PDF ↗";
+
     info.append(link);
   } else {
     const invalid = document.createElement("p");
+
     invalid.textContent = "PDF link unavailable.";
+
     info.append(invalid);
   }
 
   card.append(icon, info);
+
   return card;
 }
 
+// ========================================
+// GET STUDY NOTES
+// ========================================
+
 async function getNotes() {
   const snap = await getDocs(
-    query(collection(db, "notes"), orderBy("createdAt", "desc"))
+    query(
+      collection(db, "notes"),
+      orderBy("createdAt", "desc")
+    )
   );
 
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 }
 
-// Load PDFs for approved students
+// ========================================
+// STUDENT LIBRARY
+// ========================================
+
 async function loadStudentNotes() {
   const root = $("notesList");
-  root.replaceChildren(document.createTextNode("Loading study PDFs…"));
+
+  root.replaceChildren(
+    document.createTextNode("Loading study PDFs…")
+  );
 
   try {
     if (
       !auth.currentUser ||
-      (!isAdmin(auth.currentUser) && currentProfile?.status !== "approved")
+      (
+        !isAdmin(auth.currentUser) &&
+        currentProfile?.status !== "approved"
+      )
     ) {
       root.replaceChildren(
-        makeEmpty("Your library will be available after administrator approval.")
+        makeEmpty(
+          "Your library will be available after administrator approval."
+        )
       );
+
       return;
     }
 
@@ -523,44 +662,67 @@ async function loadStudentNotes() {
     const filtered =
       activeSemester === "all"
         ? notes
-        : notes.filter(n => String(n.semester) === activeSemester);
+        : notes.filter(
+            n => String(n.semester) === activeSemester
+          );
 
     root.replaceChildren();
 
     if (!filtered.length) {
       root.append(
-        makeEmpty("No PDFs have been added for this semester yet.")
+        makeEmpty(
+          "No PDFs have been added for this semester yet."
+        )
       );
+
       return;
     }
 
     const grid = document.createElement("div");
     grid.className = "pdf-grid";
 
-    filtered.forEach(n => grid.append(buildPdfCard(n)));
+    filtered.forEach(n => {
+      grid.append(buildPdfCard(n));
+    });
+
     root.append(grid);
   } catch (e) {
     root.replaceChildren(
-      makeEmpty("Could not load PDFs. Please check the Firestore rules.")
+      makeEmpty(
+        "Could not load PDFs. Please check the Firestore rules."
+      )
     );
+
     message(errorText(e), "error");
   }
 }
 
-// Admin PDF list
+// ========================================
+// ADMIN: EXISTING PDF MANAGEMENT
+// ========================================
+
 async function loadAdminNotes() {
   const root = $("adminNotes");
 
-  if (!isAdmin(auth.currentUser)) return;
+  if (!isAdmin(auth.currentUser)) {
+    root.replaceChildren();
+    return;
+  }
 
-  root.replaceChildren(document.createTextNode("Loading PDFs…"));
+  root.replaceChildren(
+    document.createTextNode("Loading PDFs…")
+  );
 
   try {
     const notes = await getNotes();
+
     root.replaceChildren();
 
     if (!notes.length) {
-      root.append(makeEmpty("No PDFs have been added yet."));
+      root.append(
+        makeEmpty("No PDFs have been added yet.")
+      );
+
       return;
     }
 
@@ -586,19 +748,31 @@ async function loadAdminNotes() {
 
       if (url) {
         const link = document.createElement("a");
+
         link.href = url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
         link.textContent = "Open PDF";
+
         actions.append(link);
       }
 
       const del = document.createElement("button");
+
       del.className = "danger";
       del.textContent = "Delete";
 
       del.addEventListener("click", async () => {
-        if (!confirm(`Delete "${note.title || "this PDF"}" from the library?`)) {
+        if (!isAdmin(auth.currentUser)) {
+          message("Administrator access required.", "error");
+          return;
+        }
+
+        if (
+          !confirm(
+            `Delete "${note.title || "this PDF"}" from the library?`
+          )
+        ) {
           return;
         }
 
@@ -606,7 +780,12 @@ async function loadAdminNotes() {
 
         try {
           await deleteDoc(doc(db, "notes", note.id));
-          message("PDF removed from the library.", "success");
+
+          message(
+            "PDF removed from the library.",
+            "success"
+          );
+
           await loadAdminNotes();
           await loadStudentNotes();
         } catch (err) {
@@ -616,19 +795,28 @@ async function loadAdminNotes() {
       });
 
       actions.append(del);
+
       row.append(info, actions);
+
       root.append(row);
     });
   } catch (e) {
     root.replaceChildren(
-      makeEmpty("Could not load PDFs. Check Firestore rules.")
+      makeEmpty(
+        "Could not load PDFs. Check Firestore rules."
+      )
     );
+
     message(errorText(e), "error");
   }
 }
 
-// Handle signed-in users
+// ========================================
+// SHOW THE CORRECT PAGE FOR EACH USER
+// ========================================
+
 async function render(user) {
+  // Admin panel includes the Login Time section in the edited HTML.
   visible("auth", !user);
   visible("account", !!user);
   visible("admin", isAdmin(user));
@@ -645,25 +833,35 @@ async function render(user) {
   }
 
   $("email").textContent = user.email || "";
+
   $("welcome").textContent = isAdmin(user)
     ? "Administrator account"
     : "Your student account";
 
   try {
+    // Administrator account
     if (isAdmin(user)) {
       $("studentStatus").textContent =
         "Administrator access configured.";
 
-      message("Signed in as administrator.", "success");
+      message(
+        "Signed in as administrator.",
+        "success"
+      );
+
       visible("materials", true);
 
       await loadUsers();
       await loadAdminNotes();
       await loadStudentNotes();
+
       return;
     }
 
-    const snap = await getDoc(doc(db, "users", user.uid));
+    // Student account
+    const snap = await getDoc(
+      doc(db, "users", user.uid)
+    );
 
     if (!snap.exists()) {
       $("studentStatus").textContent =
@@ -673,6 +871,7 @@ async function render(user) {
         "Profile not found. If you just registered, check Firestore permissions.",
         "error"
       );
+
       return;
     }
 
@@ -683,39 +882,64 @@ async function render(user) {
         "Your account is approved. You can access the study library below.";
 
       visible("materials", true);
-      message("Your account is approved.", "success");
+
+      message(
+        "Your account is approved.",
+        "success"
+      );
+
       await loadStudentNotes();
     } else if (currentProfile.status === "rejected") {
       $("studentStatus").textContent =
         "Your registration was not approved. Please contact the administrator if you think this is a mistake.";
 
-      message("Registration not approved.", "error");
+      message(
+        "Registration not approved.",
+        "error"
+      );
     } else {
       $("studentStatus").textContent =
         "Your account is waiting for administrator approval.";
 
-      message("Signed in. Waiting for approval.");
+      message(
+        "Signed in. Waiting for approval."
+      );
     }
   } catch (e) {
     message(errorText(e), "error");
   }
 }
 
+// Listen for Firebase authentication changes
+onAuthStateChanged(auth, user => {
+  render(user).catch(e => {
+    message(errorText(e), "error");
+  });
+});
 
-onAuthStateChanged(auth, user =>
-  render(user).catch(e => message(errorText(e), "error"))
-);
+// ========================================
+// LOGIN TIME BUTTON
+// ========================================
 
-/* ADDITION: Login Time option */
-const loginTimeButton = document.getElementById("loginTimeButton");
+const loginTimeButton =
+  document.getElementById("loginTimeButton");
 
 if (loginTimeButton) {
   loginTimeButton.addEventListener("click", () => {
+    // Check the signed-in account before opening history
     if (!isAdmin(auth.currentUser)) {
-      message("Administrator access required.", "error");
+      message(
+        "Administrator access required.",
+        "error"
+      );
+
       return;
     }
 
-    window.open("./login-history.html", "_blank", "noopener");
+    window.open(
+      "./login-history.html",
+      "_blank",
+      "noopener"
+    );
   });
 }
