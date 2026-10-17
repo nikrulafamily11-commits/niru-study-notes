@@ -6,9 +6,7 @@
   <title>Student Login History | Niru Study Notes</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -27,21 +25,9 @@
       box-shadow: 0 5px 22px rgba(0, 0, 0, 0.07);
     }
 
-    h1 {
-      margin-top: 0;
-      color: #145da0;
-      font-size: 25px;
-    }
-
-    h2 {
-      margin-top: 24px;
-      font-size: 20px;
-    }
-
-    .muted {
-      color: #64748b;
-      font-size: 14px;
-    }
+    h1 { margin-top: 0; color: #145da0; font-size: 25px; }
+    h2 { margin-top: 24px; font-size: 20px; }
+    .muted { color: #64748b; font-size: 14px; }
 
     .toolbar {
       display: flex;
@@ -67,21 +53,10 @@
       color: #145da0;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    .message { margin: 12px 0; color: #475569; font-size: 14px; }
 
-    .message {
-      margin: 12px 0;
-      color: #475569;
-      font-size: 14px;
-    }
-
-    .student-list {
-      display: grid;
-      gap: 10px;
-    }
+    .student-list { display: grid; gap: 10px; }
 
     .student-card {
       display: block;
@@ -95,10 +70,7 @@
       cursor: pointer;
     }
 
-    .student-card:hover {
-      border-color: #1769c2;
-      background: #f8fbff;
-    }
+    .student-card:hover { border-color: #1769c2; background: #f8fbff; }
 
     .student-name {
       display: block;
@@ -108,9 +80,7 @@
       font-weight: bold;
     }
 
-    .student-email,
-    .last-login,
-    .online-note {
+    .student-email, .last-login, .online-note {
       display: block;
       margin-top: 4px;
       overflow-wrap: anywhere;
@@ -118,30 +88,13 @@
       color: #64748b;
     }
 
-    .online-note {
-      font-weight: bold;
-    }
+    .online-note { font-weight: bold; }
+    .online-note.online { color: #15803d; }
+    .online-note.offline { color: #64748b; }
+    .online-note.unknown { color: #9a6700; }
+    .hidden { display: none !important; }
 
-    .online-note.online {
-      color: #15803d;
-    }
-
-    .online-note.offline {
-      color: #64748b;
-    }
-
-    .online-note.unknown {
-      color: #9a6700;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-    }
+    .table-wrap { width: 100%; overflow-x: auto; }
 
     table {
       width: 100%;
@@ -157,34 +110,14 @@
       vertical-align: top;
     }
 
-    th {
-      background: #f2f6fc;
-      color: #334155;
-    }
-
-    .empty {
-      padding: 18px;
-      color: #64748b;
-      text-align: center;
-    }
+    th { background: #f2f6fc; color: #334155; }
+    .empty { padding: 18px; color: #64748b; text-align: center; }
 
     @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-
-      main {
-        padding: 16px;
-      }
-
-      h1 {
-        font-size: 22px;
-      }
-
-      th, td {
-        padding: 10px 8px;
-        font-size: 13px;
-      }
+      body { padding: 10px; }
+      main { padding: 16px; }
+      h1 { font-size: 22px; }
+      th, td { padding: 10px 8px; font-size: 13px; }
     }
   </style>
 </head>
@@ -208,8 +141,8 @@
   <section id="studentSection" class="hidden">
     <h2>Students</h2>
     <p class="muted">
-      Online status is read from Firebase Realtime Database. “Last login”
-      is the latest login event recorded in Firestore.
+      Online status is read from Firebase Realtime Database.
+      Last login is the latest event recorded in Firestore.
     </p>
     <div id="studentList" class="student-list"></div>
   </section>
@@ -264,9 +197,9 @@
     onValue
   } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
-  // Firebase configuration
+  // IMPORTANT: Paste the valid apiKey from your Firebase Web app config.
   const firebaseConfig = {
-    apiKey: "AIzaSyDaMLePSVjVJetQsSvDDgp7XiczIfHSBQU",
+    apiKey: "PASTE_YOUR_VALID_FIREBASE_API_KEY_HERE",
     authDomain: "niru-study-portal.firebaseapp.com",
     projectId: "niru-study-portal",
     storageBucket: "niru-study-portal.firebasestorage.app",
@@ -274,10 +207,9 @@
     appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
   };
 
-  // Administrator UID
+  // UID of the administrator account
   const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -293,9 +225,6 @@
   let loginRecords = [];
   let presenceByUid = {};
   let selectedStudent = null;
-
-  // Listen for live presence changes.
-  // This page is intended to be used by the configured admin.
   let presenceUnsubscribe = null;
 
   function showMessage(text) {
@@ -311,11 +240,9 @@
   }
 
   function formatPresenceTime(value) {
-    if (typeof value !== "number") {
-      return "";
-    }
-
-    return new Date(value).toLocaleString();
+    return typeof value === "number"
+      ? new Date(value).toLocaleString()
+      : "";
   }
 
   function presenceLabel(uid) {
@@ -329,10 +256,7 @@
     }
 
     if (presence.state === "online") {
-      return {
-        text: "● Online",
-        className: "online"
-      };
+      return { text: "● Online", className: "online" };
     }
 
     const changedAt = formatPresenceTime(presence.lastChanged);
@@ -345,7 +269,7 @@
     };
   }
 
-  function showEmptyRow(text) {
+  function emptyRow(text) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
 
@@ -357,68 +281,12 @@
     return tr;
   }
 
-  function startPresenceListener() {
-    if (presenceUnsubscribe) {
-      presenceUnsubscribe();
-      presenceUnsubscribe = null;
-    }
+  function renderStudentPresence(student) {
+    const status = presenceLabel(student.uid);
+    const element = $("selectedStudentPresence");
 
-    const presenceRef = ref(rtdb, "presence");
-
-    presenceUnsubscribe = onValue(
-      presenceRef,
-      snapshot => {
-        presenceByUid = snapshot.val() || {};
-
-        // Update the student cards without reloading Firestore.
-        renderStudentList();
-
-        // If a student history is open, update their displayed status.
-        if (selectedStudent) {
-          renderSelectedStudentPresence(selectedStudent);
-        }
-      },
-      error => {
-        console.error("Could not read online presence:", error);
-        showMessage(
-          "Could not read online status. Check Realtime Database rules."
-        );
-      }
-    );
-  }
-
-  async function loadLoginData() {
-    showMessage("Loading student and login data…");
-    $("studentList").replaceChildren();
-
-    // Load registered student profiles.
-    const usersSnapshot = await getDocs(collection(db, "users"));
-
-    students = usersSnapshot.docs.map(document => ({
-      uid: document.id,
-      ...document.data()
-    }));
-
-    // Load login records, newest first.
-    const historyQuery = query(
-      collection(db, "loginHistory"),
-      orderBy("loginAt", "desc")
-    );
-
-    const historySnapshot = await getDocs(historyQuery);
-
-    loginRecords = historySnapshot.docs.map(document => ({
-      id: document.id,
-      ...document.data()
-    }));
-
-    renderStudentList();
-
-    showMessage(`Loaded ${students.length} student account(s).`);
-
-    $("studentSection").classList.remove("hidden");
-    $("historySection").classList.add("hidden");
-    selectedStudent = null;
+    element.className = `online-note ${status.className}`;
+    element.textContent = status.text;
   }
 
   function renderStudentList() {
@@ -433,13 +301,13 @@
       return;
     }
 
-    const sortedStudents = [...students].sort((a, b) =>
+    const sorted = [...students].sort((a, b) =>
       String(a.name || a.email || "").localeCompare(
         String(b.name || b.email || "")
       )
     );
 
-    for (const student of sortedStudents) {
+    for (const student of sorted) {
       const records = loginRecords.filter(
         record => record.userId === student.uid
       );
@@ -464,12 +332,166 @@
         ? `Last login: ${formatLoginTime(latest.loginAt)}`
         : "Last login: No login record";
 
-      const onlineNote = document.createElement("span");
+      const online = document.createElement("span");
       const status = presenceLabel(student.uid);
+      online.className = `online-note ${status.className}`;
+      online.textContent = status.text;
 
-      onlineNote.className = `online-note ${status.className}`;
-      onlineNote.textContent = status.text;
+      card.append(name, email, lastLogin, online);
 
-      card.append(name, email, lastLogin, onlineNote);
+      card.addEventListener("click", () => {
+        showStudentHistory(student);
+      });
 
-      card.add
+      root.append(card);
+    }
+  }
+
+  function showStudentHistory(student) {
+    selectedStudent = student;
+
+    $("studentSection").classList.add("hidden");
+    $("historySection").classList.remove("hidden");
+
+    $("historyHeading").textContent =
+      `Login history: ${student.name || student.email || "Student"}`;
+
+    $("historySubheading").textContent = student.email || "";
+    $("historyMessage").textContent = "";
+
+    renderStudentPresence(student);
+
+    const records = loginRecords
+      .filter(record => record.userId === student.uid)
+      .slice(0, 15);
+
+    const root = $("historyRows");
+    root.replaceChildren();
+
+    if (records.length === 0) {
+      root.append(emptyRow("No login records found for this student."));
+      return;
+    }
+
+    for (const record of records) {
+      const tr = document.createElement("tr");
+
+      const timeCell = document.createElement("td");
+      timeCell.textContent = formatLoginTime(record.loginAt);
+
+      const uidCell = document.createElement("td");
+      uidCell.textContent = record.userId || "Unavailable";
+
+      tr.append(timeCell, uidCell);
+      root.append(tr);
+    }
+  }
+
+  async function loadLoginData() {
+    showMessage("Loading student and login data…");
+    $("refreshButton").disabled = true;
+
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+
+      students = usersSnapshot.docs.map(document => ({
+        uid: document.id,
+        ...document.data()
+      }));
+
+      const historyQuery = query(
+        collection(db, "loginHistory"),
+        orderBy("loginAt", "desc")
+      );
+
+      const historySnapshot = await getDocs(historyQuery);
+
+      loginRecords = historySnapshot.docs.map(document => ({
+        id: document.id,
+        ...document.data()
+      }));
+
+      renderStudentList();
+
+      $("studentSection").classList.remove("hidden");
+      $("historySection").classList.add("hidden");
+      selectedStudent = null;
+
+      showMessage(
+        `Loaded ${students.length} account(s) and ${loginRecords.length} login record(s).`
+      );
+    } catch (error) {
+      console.error("Failed to load login history data:", error);
+
+      showMessage(
+        `Could not load data: ${error.code || error.message || error}. Check Firestore security rules.`
+      );
+    } finally {
+      $("refreshButton").disabled = false;
+    }
+  }
+
+  function startPresenceListener() {
+    if (presenceUnsubscribe) {
+      presenceUnsubscribe();
+      presenceUnsubscribe = null;
+    }
+
+    presenceUnsubscribe = onValue(
+      ref(rtdb, "presence"),
+      snapshot => {
+        presenceByUid = snapshot.val() || {};
+        renderStudentList();
+
+        if (selectedStudent) {
+          renderStudentPresence(selectedStudent);
+        }
+      },
+      error => {
+        console.error("Realtime Database presence error:", error);
+        showMessage(
+          "Student list is available, but online status could not be loaded. Check Realtime Database rules."
+        );
+      }
+    );
+  }
+
+  $("refreshButton").addEventListener("click", async () => {
+    await loadLoginData();
+  });
+
+  $("backButton").addEventListener("click", () => {
+    selectedStudent = null;
+    $("historySection").classList.add("hidden");
+    $("studentSection").classList.remove("hidden");
+  });
+
+  // Wait for Firebase Auth to resolve the current session before checking admin.
+  // This prevents the page from getting stuck checking auth too early.
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      showMessage(
+        "You are not signed in. Go back to the website and sign in as administrator."
+      );
+      $("studentSection").classList.add("hidden");
+      $("historySection").classList.add("hidden");
+      return;
+    }
+
+    if (user.uid !== ADMIN_UID) {
+      showMessage(
+        "Administrator access denied. Please sign in with the configured administrator account."
+      );
+      $("studentSection").classList.add("hidden");
+      $("historySection").classList.add("hidden");
+      return;
+    }
+
+    showMessage("Administrator verified. Loading login history…");
+
+    startPresenceListener();
+    await loadLoginData();
+  });
+</script>
+</body>
+</html>
