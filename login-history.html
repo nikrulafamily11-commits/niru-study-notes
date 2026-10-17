@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,7 +108,9 @@
       font-weight: bold;
     }
 
-    .student-email, .last-login, .online-note {
+    .student-email,
+    .last-login,
+    .online-note {
       display: block;
       margin-top: 4px;
       overflow-wrap: anywhere;
@@ -118,6 +119,18 @@
     }
 
     .online-note {
+      font-weight: bold;
+    }
+
+    .online-note.online {
+      color: #15803d;
+    }
+
+    .online-note.offline {
+      color: #64748b;
+    }
+
+    .online-note.unknown {
       color: #9a6700;
     }
 
@@ -182,12 +195,12 @@
 
   <p class="muted">
     Administrator view: select a student to see their 15 most recent
-    recorded login events.
+    recorded login events and current online status.
   </p>
 
   <div class="toolbar">
     <a class="button secondary" href="./index.html">Back to website</a>
-    <button id="refreshButton">Refresh students</button>
+    <button id="refreshButton" type="button">Refresh students</button>
   </div>
 
   <p id="statusMessage" class="message">Checking administrator access…</p>
@@ -195,19 +208,22 @@
   <section id="studentSection" class="hidden">
     <h2>Students</h2>
     <p class="muted">
-      “Last login” means the most recent event recorded by the website.
-      This page does not yet track whether a student is currently online.
+      Online status is read from Firebase Realtime Database. “Last login”
+      is the latest login event recorded in Firestore.
     </p>
     <div id="studentList" class="student-list"></div>
   </section>
 
   <section id="historySection" class="hidden">
     <div class="toolbar">
-      <button id="backButton" class="secondary">← Back to students</button>
+      <button id="backButton" class="secondary" type="button">
+        ← Back to students
+      </button>
     </div>
 
     <h2 id="historyHeading">Login history</h2>
     <p id="historySubheading" class="muted"></p>
+    <p id="selectedStudentPresence" class="online-note"></p>
 
     <div class="table-wrap">
       <table>
@@ -220,6 +236,7 @@
         <tbody id="historyRows"></tbody>
       </table>
     </div>
+
     <p id="historyMessage" class="message"></p>
   </section>
 </main>
@@ -238,12 +255,18 @@
     collection,
     getDocs,
     query,
-    orderBy,
-    limit
+    orderBy
   } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
+  import {
+    getDatabase,
+    ref,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+  // Firebase configuration
   const firebaseConfig = {
-    apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
+    apiKey: "AIzaSyDaMLePSVjVJetQsSvDDgp7XiczIfHSBQU",
     authDomain: "niru-study-portal.firebaseapp.com",
     projectId: "niru-study-portal",
     storageBucket: "niru-study-portal.firebasestorage.app",
@@ -251,16 +274,29 @@
     appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
   };
 
+  // Administrator UID
   const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  const rtdb = getDatabase(
+    app,
+    "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app"
+  );
 
   const $ = id => document.getElementById(id);
 
   let students = [];
   let loginRecords = [];
+  let presenceByUid = {};
+  let selectedStudent = null;
+
+  // Listen for live presence changes.
+  // This page is intended to be used by the configured admin.
+  let presenceUnsubscribe = null;
 
   function showMessage(text) {
     $("statusMessage").textContent = text;
@@ -272,6 +308,41 @@
     }
 
     return timestamp.toDate().toLocaleString();
+  }
+
+  function formatPresenceTime(value) {
+    if (typeof value !== "number") {
+      return "";
+    }
+
+    return new Date(value).toLocaleString();
+  }
+
+  function presenceLabel(uid) {
+    const presence = presenceByUid[uid];
+
+    if (!presence || !presence.state) {
+      return {
+        text: "Online status: not available",
+        className: "unknown"
+      };
+    }
+
+    if (presence.state === "online") {
+      return {
+        text: "● Online",
+        className: "online"
+      };
+    }
+
+    const changedAt = formatPresenceTime(presence.lastChanged);
+
+    return {
+      text: changedAt
+        ? `○ Offline · Last status change: ${changedAt}`
+        : "○ Offline",
+      className: "offline"
+    };
   }
 
   function showEmptyRow(text) {
@@ -286,11 +357,41 @@
     return tr;
   }
 
+  function startPresenceListener() {
+    if (presenceUnsubscribe) {
+      presenceUnsubscribe();
+      presenceUnsubscribe = null;
+    }
+
+    const presenceRef = ref(rtdb, "presence");
+
+    presenceUnsubscribe = onValue(
+      presenceRef,
+      snapshot => {
+        presenceByUid = snapshot.val() || {};
+
+        // Update the student cards without reloading Firestore.
+        renderStudentList();
+
+        // If a student history is open, update their displayed status.
+        if (selectedStudent) {
+          renderSelectedStudentPresence(selectedStudent);
+        }
+      },
+      error => {
+        console.error("Could not read online presence:", error);
+        showMessage(
+          "Could not read online status. Check Realtime Database rules."
+        );
+      }
+    );
+  }
+
   async function loadLoginData() {
     showMessage("Loading student and login data…");
     $("studentList").replaceChildren();
 
-    // Load registered student profiles
+    // Load registered student profiles.
     const usersSnapshot = await getDocs(collection(db, "users"));
 
     students = usersSnapshot.docs.map(document => ({
@@ -298,8 +399,7 @@
       ...document.data()
     }));
 
-    // Load login records, newest first
-    // Then group them in the browser by student UID.
+    // Load login records, newest first.
     const historyQuery = query(
       collection(db, "loginHistory"),
       orderBy("loginAt", "desc")
@@ -313,9 +413,12 @@
     }));
 
     renderStudentList();
+
     showMessage(`Loaded ${students.length} student account(s).`);
+
     $("studentSection").classList.remove("hidden");
     $("historySection").classList.add("hidden");
+    selectedStudent = null;
   }
 
   function renderStudentList() {
@@ -330,13 +433,13 @@
       return;
     }
 
-    students.sort((a, b) =>
+    const sortedStudents = [...students].sort((a, b) =>
       String(a.name || a.email || "").localeCompare(
         String(b.name || b.email || "")
       )
     );
 
-    for (const student of students) {
+    for (const student of sortedStudents) {
       const records = loginRecords.filter(
         record => record.userId === student.uid
       );
@@ -362,95 +465,11 @@
         : "Last login: No login record";
 
       const onlineNote = document.createElement("span");
-      onlineNote.className = "online-note";
-      onlineNote.textContent = "Online status: not tracked";
+      const status = presenceLabel(student.uid);
+
+      onlineNote.className = `online-note ${status.className}`;
+      onlineNote.textContent = status.text;
 
       card.append(name, email, lastLogin, onlineNote);
 
-      card.addEventListener("click", () => {
-        openStudentHistory(student);
-      });
-
-      root.append(card);
-    }
-  }
-
-  function openStudentHistory(student) {
-    const records = loginRecords
-      .filter(record => record.userId === student.uid)
-      .slice(0, 15);
-
-    $("historyHeading").textContent =
-      `${student.name || "Student"} — Login history`;
-
-    $("historySubheading").textContent =
-      student.email || `User ID: ${student.uid}`;
-
-    const tbody = $("historyRows");
-    tbody.replaceChildren();
-
-    if (records.length === 0) {
-      tbody.append(showEmptyRow("No login events recorded for this student."));
-    } else {
-      for (const record of records) {
-        const tr = document.createElement("tr");
-
-        const dateCell = document.createElement("td");
-        dateCell.textContent = formatLoginTime(record.loginAt);
-
-        const uidCell = document.createElement("td");
-        uidCell.textContent = record.userId || student.uid;
-
-        tr.append(dateCell, uidCell);
-        tbody.append(tr);
-      }
-    }
-
-    $("historyMessage").textContent =
-      `Showing ${records.length} most recent record(s), up to 15.`;
-
-    $("studentSection").classList.add("hidden");
-    $("historySection").classList.remove("hidden");
-  }
-
-  $("refreshButton").addEventListener("click", async () => {
-    try {
-      await loadLoginData();
-    } catch (error) {
-      console.error(error);
-      showMessage("Could not load data. Check Firestore rules and browser Console.");
-    }
-  });
-
-  $("backButton").addEventListener("click", () => {
-    $("historySection").classList.add("hidden");
-    $("studentSection").classList.remove("hidden");
-  });
-
-  onAuthStateChanged(auth, async user => {
-    if (!user) {
-      showMessage("Please sign in as the administrator on the main website, then open this page again.");
-      $("studentSection").classList.add("hidden");
-      $("historySection").classList.add("hidden");
-      return;
-    }
-
-    if (user.uid !== ADMIN_UID) {
-      showMessage("Administrator access required.");
-      $("studentSection").classList.add("hidden");
-      $("historySection").classList.add("hidden");
-      return;
-    }
-
-    try {
-      await loadLoginData();
-    } catch (error) {
-      console.error(error);
-      showMessage(
-        "Could not load login history. Confirm Firestore rules allow the admin to read users and loginHistory."
-      );
-    }
-  });
-</script>
-</body>
-</html>
+      card.add
