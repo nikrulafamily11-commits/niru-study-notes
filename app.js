@@ -91,7 +91,25 @@ function errorText(e) {
       "Use a password with at least 6 characters.",
 
     "auth/invalid-credential":
-      "Email or password is incorrect.",
+      "Email or password is incorrect. Check the email and password, then try again.",
+
+    "auth/user-not-found":
+      "No account was found for this email. Register first or check the email.",
+
+    "auth/wrong-password":
+      "Incorrect password. Please try again.",
+
+    "auth/user-disabled":
+      "This account has been disabled. Contact the administrator.",
+
+    "auth/too-many-requests":
+      "Too many attempts. Wait a while and try again.",
+
+    "auth/network-request-failed":
+      "Network connection failed. Check your internet and try again.",
+
+    "auth/api-key-not-valid":
+      "Firebase API key is invalid. Verify the web app's Firebase configuration.",
 
     "auth/operation-not-allowed":
       "Enable Email/Password in Firebase Authentication.",
@@ -274,7 +292,6 @@ if ($("login")) {
     }
   });
 }
-
 // ========================================
 // LOGOUT
 // ========================================
@@ -549,8 +566,7 @@ async function loadUsers() {
 
       const actions = document.createElement("div");
       actions.className = "user-actions";
-
-      // Approve or revoke access.
+            // Approve or revoke access.
       if (u.status !== "rejected") {
         const approve = document.createElement("button");
 
@@ -934,7 +950,6 @@ async function loadAdminNotes() {
     message(errorText(e), "error");
   }
 }
-
 // ========================================
 // SHOW THE CORRECT PAGE FOR EACH USER
 // ========================================
@@ -988,9 +1003,14 @@ async function render(user) {
     }
 
     // Student account.
-    const snap = await getDoc(
-      doc(db, "users", user.uid)
-    );
+    let snap = await getDoc(doc(db, "users", user.uid));
+
+    // Registration may create the Auth account just before its profile is saved.
+    // Retry once if the profile is not immediately available.
+    if (!snap.exists()) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      snap = await getDoc(doc(db, "users", user.uid));
+    }
 
     if (!snap.exists()) {
       if ($("studentStatus")) {
