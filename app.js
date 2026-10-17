@@ -49,7 +49,7 @@ const firebaseConfig = {
 const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
 // Initialize Firebase services
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(npm install firebase);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
