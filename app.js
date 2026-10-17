@@ -1,4 +1,3 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
 import {
@@ -24,9 +23,21 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-// Firebase configuration
+import {
+  getDatabase,
+  ref,
+  onValue,
+  onDisconnect,
+  set,
+  serverTimestamp as rtdbServerTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+// ========================================
+// FIREBASE CONFIGURATION
+// ========================================
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
+  apiKey: "AIzaSyDaMLePSVjVJetQsSvDDgp7XiczIfHSBQU",
   authDomain: "niru-study-portal.firebaseapp.com",
   projectId: "niru-study-portal",
   storageBucket: "niru-study-portal.firebasestorage.app",
@@ -37,10 +48,19 @@ const firebaseConfig = {
 // Administrator UID
 const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
-// Initialize Firebase
+// Initialize Firebase services
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const rtdb = getDatabase(
+  app,
+  "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app"
+);
+
+// ========================================
+// GENERAL HELPERS
+// ========================================
 
 const $ = id => document.getElementById(id);
 
@@ -50,13 +70,11 @@ let activeSemester = "all";
 let activeUserStatus = "pending";
 let currentProfile = null;
 
-// Display messages
 function message(text, type = "") {
   $("message").textContent = text;
   $("message").className = "message " + type;
 }
 
-// Convert Firebase errors into readable messages
 function errorText(e) {
   const known = {
     "auth/email-already-in-use":
@@ -75,21 +93,18 @@ function errorText(e) {
       "Enable Email/Password in Firebase Authentication.",
 
     "permission-denied":
-      "Permission denied. Check Firestore rules and confirm the administrator UID."
+      "Permission denied. Check Firebase security rules and confirm the administrator UID."
   };
 
   return known[e.code] || e.message || "Something went wrong.";
 }
 
-// Show or hide an HTML element
 const visible = (id, on) =>
   $(id).classList.toggle("hidden", !on);
 
-// Verify administrator identity
 const isAdmin = user =>
   !!user && user.uid === ADMIN_UID;
 
-// Create empty-state messages safely
 function makeEmpty(text) {
   const p = document.createElement("p");
   p.className = "empty-state";
@@ -97,7 +112,6 @@ function makeEmpty(text) {
   return p;
 }
 
-// Accept only HTTP and HTTPS links
 function safeUrl(raw) {
   try {
     const u = new URL(raw);
@@ -108,6 +122,52 @@ function safeUrl(raw) {
   } catch {
     return null;
   }
+}
+
+// ========================================
+// ONLINE PRESENCE TRACKING
+// ========================================
+
+let presenceUnsubscribe = null;
+
+function startPresenceTracking(user) {
+  // Remove the previous connection listener, if any.
+  if (presenceUnsubscribe) {
+    presenceUnsubscribe();
+    presenceUnsubscribe = null;
+  }
+
+  if (!user) return;
+
+  const presenceRef = ref(rtdb, `presence/${user.uid}`);
+  const connectedRef = ref(rtdb, ".info/connected");
+
+  presenceUnsubscribe = onValue(
+    connectedRef,
+    async snapshot => {
+      // Firebase reports whether this browser is connected.
+      if (snapshot.val() !== true) return;
+
+      try {
+        // Register an offline update in case this connection drops.
+        await onDisconnect(presenceRef).set({
+          state: "offline",
+          lastChanged: rtdbServerTimestamp()
+        });
+
+        // Mark this account online.
+        await set(presenceRef, {
+          state: "online",
+          lastChanged: rtdbServerTimestamp()
+        });
+      } catch (error) {
+        console.error("Presence update failed:", error);
+      }
+    },
+    error => {
+      console.error("Presence connection listener failed:", error);
+    }
+  );
 }
 
 // ========================================
@@ -164,14 +224,13 @@ $("login").addEventListener("submit", async e => {
   btn.disabled = true;
 
   try {
-    // Sign in with Firebase Authentication
     const credential = await signInWithEmailAndPassword(
       auth,
       $("loginEmail").value.trim(),
       $("loginPassword").value
     );
 
-    // Record each successful login in Firestore
+    // Record each successful login in Firestore.
     try {
       await addDoc(collection(db, "loginHistory"), {
         userId: credential.user.uid,
@@ -185,8 +244,10 @@ $("login").addEventListener("submit", async e => {
         "success"
       );
     } catch (historyError) {
-      // Authentication worked, but Firestore did not save the event
-      console.error("Could not save login history:", historyError);
+      console.error(
+        "Could not save login history:",
+        historyError
+      );
 
       $("login").reset();
 
@@ -208,6 +269,16 @@ $("login").addEventListener("submit", async e => {
 
 $("logout").addEventListener("click", async () => {
   try {
+    const user = auth.currentUser;
+
+    // Mark the user offline when they deliberately sign out.
+    if (user) {
+      await set(ref(rtdb, `presence/${user.uid}`), {
+        state: "offline",
+        lastChanged: rtdbServerTimestamp()
+      });
+    }
+
     await signOut(auth);
     message("Signed out.");
   } catch (e) {
@@ -376,7 +447,7 @@ async function loadUsers() {
       rejected: students.filter(u => u.status === "rejected").length
     };
 
-    // Update tab labels and counts
+    // Update tab labels and counts.
     document.querySelectorAll("[data-user-status]").forEach(button => {
       const status = button.dataset.userStatus;
 
@@ -449,7 +520,7 @@ async function loadUsers() {
       const actions = document.createElement("div");
       actions.className = "user-actions";
 
-      // Approve or revoke access
+      // Approve or revoke access.
       if (u.status !== "rejected") {
         const approve = document.createElement("button");
 
@@ -494,7 +565,7 @@ async function loadUsers() {
         actions.append(approve);
       }
 
-      // Reject a student
+      // Reject a student.
       if (u.status !== "rejected") {
         const reject = document.createElement("button");
 
@@ -532,7 +603,7 @@ async function loadUsers() {
 
         actions.append(reject);
       } else {
-        // Restore rejected student to pending
+        // Restore rejected student to pending.
         const restore = document.createElement("button");
 
         restore.textContent = "Move to Pending";
@@ -719,7 +790,7 @@ async function loadStudentNotes() {
 }
 
 // ========================================
-// ADMIN: EXISTING PDF MANAGEMENT
+// ADMIN: PDF MANAGEMENT
 // ========================================
 
 async function loadAdminNotes() {
@@ -859,7 +930,7 @@ async function render(user) {
     : "Your student account";
 
   try {
-    // Administrator account
+    // Administrator account.
     if (isAdmin(user)) {
       $("studentStatus").textContent =
         "Administrator access configured.";
@@ -878,7 +949,7 @@ async function render(user) {
       return;
     }
 
-    // Student account
+    // Student account.
     const snap = await getDoc(
       doc(db, "users", user.uid)
     );
@@ -930,8 +1001,15 @@ async function render(user) {
   }
 }
 
-// Listen for Firebase authentication changes
+// ========================================
+// AUTHENTICATION LISTENER
+// ========================================
+
+// Start presence tracking whenever Firebase reports a signed-in user.
+// This also handles restored login sessions after page reload.
 onAuthStateChanged(auth, user => {
+  startPresenceTracking(user);
+
   render(user).catch(e => {
     message(errorText(e), "error");
   });
@@ -942,23 +1020,4 @@ onAuthStateChanged(auth, user => {
 // ========================================
 
 const loginTimeButton =
-  document.getElementById("loginTimeButton");
-
-if (loginTimeButton) {
-  loginTimeButton.addEventListener("click", () => {
-    if (!isAdmin(auth.currentUser)) {
-      message(
-        "Administrator access required.",
-        "error"
-      );
-
-      return;
-    }
-
-    window.open(
-      "./login-history.html",
-      "_blank",
-      "noopener"
-    );
-  });
-}
+  document
