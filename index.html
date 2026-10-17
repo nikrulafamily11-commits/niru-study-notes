@@ -6,12 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#173b72">
   <meta name="description" content="Niru Study Notes for B.Sc. PCM students">
+
   <title>Niru Study Notes</title>
+
   <link rel="stylesheet" href="./style.css">
   <link rel="icon" href="./niru-logo.png" type="image/png">
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -19,9 +24,19 @@
       color: #1d2940;
       line-height: 1.6;
     }
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-    .hidden { display: none !important; }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     .site-header {
       background: #173b72;
       color: white;
@@ -30,10 +45,27 @@
       align-items: center;
       gap: 12px;
     }
-    .site-header img { width: 48px; height: 48px; object-fit: contain; }
-    .site-header h1 { margin: 0; font-size: 1.4rem; }
-    .site-header p { margin: 0; }
-    main { width: min(1000px, 92%); margin: 24px auto; }
+
+    .site-header img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .site-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .site-header p {
+      margin: 0;
+    }
+
+    main {
+      width: min(1000px, 92%);
+      margin: 24px auto;
+    }
+
     .hero {
       position: relative;
       min-height: 240px;
@@ -46,15 +78,28 @@
       background: #173b72 url("./nature-waterfall.png") center/cover no-repeat;
       overflow: hidden;
     }
+
     .hero::before {
       content: "";
       position: absolute;
       inset: 0;
       background: rgba(5, 22, 50, .55);
     }
-    .hero-content { position: relative; z-index: 1; }
-    .hero h2 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin: 0; }
-    .hero p { margin: 8px 0; }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h2 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      margin: 0;
+    }
+
+    .hero p {
+      margin: 8px 0;
+    }
+
     .card {
       background: white;
       border-radius: 16px;
@@ -62,17 +107,38 @@
       margin: 22px 0;
       box-shadow: 0 5px 22px rgba(20, 40, 80, .08);
     }
-    .auth-card { max-width: 500px; margin: 24px auto; }
-    h2 { margin-top: 5px; }
+
+    .auth-card {
+      max-width: 500px;
+      margin: 24px auto;
+    }
+
+    h2 {
+      margin-top: 5px;
+    }
+
     .eyebrow {
       color: #315bc4;
       font-size: .75rem;
       font-weight: bold;
       letter-spacing: 1.4px;
     }
-    .muted, .help-text { color: #68758b; }
-    form { display: grid; gap: 15px; }
-    label { display: grid; gap: 6px; font-weight: 600; }
+
+    .muted, .help-text {
+      color: #68758b;
+    }
+
+    form {
+      display: grid;
+      gap: 15px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 600;
+    }
+
     input, select {
       width: 100%;
       padding: 12px;
@@ -80,6 +146,7 @@
       border-radius: 9px;
       background: white;
     }
+
     button {
       padding: 12px 16px;
       border: 0;
@@ -88,10 +155,24 @@
       color: white;
       font-weight: 600;
     }
-    button:disabled { opacity: .6; }
-    button.secondary { background: #e9eef9; color: #243b70; }
-    button.danger { background: #b42332; }
-    .full-button { width: 100%; }
+
+    button:disabled {
+      opacity: .6;
+    }
+
+    button.secondary {
+      background: #e9eef9;
+      color: #243b70;
+    }
+
+    button.danger {
+      background: #b42332;
+    }
+
+    .full-button {
+      width: 100%;
+    }
+
     .screen-link {
       display: block;
       width: 100%;
@@ -100,10 +181,23 @@
       color: #234fc7;
       border: 1px solid #d8deea;
     }
-    .screen-link:hover { background: #f0f4ff; }
-    .message { overflow-wrap: anywhere; }
-    .message.error { color: #b42332; }
-    .message.success { color: #147447; }
+
+    .screen-link:hover {
+      background: #f0f4ff;
+    }
+
+    .message {
+      overflow-wrap: anywhere;
+    }
+
+    .message.error {
+      color: #b42332;
+    }
+
+    .message.success {
+      color: #147447;
+    }
+
     .account-line, .section-heading {
       display: flex;
       justify-content: space-between;
@@ -111,21 +205,26 @@
       gap: 14px;
       flex-wrap: wrap;
     }
+
     .student-status-tabs, .semester-filters {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin: 18px 0;
     }
+
     .student-status-tabs button, .semester-filters button {
       flex: 1 1 90px;
       background: #e9eef9;
       color: #243b70;
     }
-    .student-status-tabs button.active, .semester-filters button.active {
+
+    .student-status-tabs button.active,
+    .semester-filters button.active {
       background: #234fc7;
       color: white;
     }
+
     .user-row, .note-admin-row {
       display: flex;
       justify-content: space-between;
@@ -135,37 +234,115 @@
       padding: 14px 0;
       border-bottom: 1px solid #e5eaf2;
     }
-    .user-info, .note-row-info { display: grid; gap: 4px; overflow-wrap: anywhere; }
-    .user-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .pill { padding: 3px 9px; border-radius: 20px; background: #fff0cf; }
-    .pill.approved { background: #d9f6e7; color: #12683f; }
-    .pill.rejected { background: #fde1e1; color: #9d2222; }
-    .section-rule { border: 0; border-top: 1px solid #e5eaf2; margin: 28px 0; }
-    .count-line { margin-top: 15px; font-weight: bold; }
-    .note-form { max-width: 650px; }
-    .help-text { font-size: .85rem; font-weight: normal; }
+
+    .user-info, .note-row-info {
+      display: grid;
+      gap: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .user-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: #fff0cf;
+    }
+
+    .pill.approved {
+      background: #d9f6e7;
+      color: #12683f;
+    }
+
+    .pill.rejected {
+      background: #fde1e1;
+      color: #9d2222;
+    }
+
+    .section-rule {
+      border: 0;
+      border-top: 1px solid #e5eaf2;
+      margin: 28px 0;
+    }
+
+    .count-line {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .note-form {
+      max-width: 650px;
+    }
+
+    .help-text {
+      font-size: .85rem;
+      font-weight: normal;
+    }
+
     .pdf-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 14px;
     }
-    .pdf-card { border: 1px solid #e1e7f0; border-radius: 12px; padding: 15px; }
-    .pdf-icon { font-weight: bold; color: #a51e2b; }
-    .pdf-info { overflow-wrap: anywhere; }
-    .pdf-info h3 { margin: 5px 0; }
-    .empty-state { padding: 16px; background: #f5f7fb; border-radius: 10px; }
-    footer { text-align: center; color: #68758b; padding: 20px; }
+
+    .pdf-card {
+      border: 1px solid #e1e7f0;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .pdf-icon {
+      font-weight: bold;
+      color: #a51e2b;
+    }
+
+    .pdf-info {
+      overflow-wrap: anywhere;
+    }
+
+    .pdf-info h3 {
+      margin: 5px 0;
+    }
+
+    .empty-state {
+      padding: 16px;
+      background: #f5f7fb;
+      border-radius: 10px;
+    }
+
+    footer {
+      text-align: center;
+      color: #68758b;
+      padding: 20px;
+    }
+
     @media (max-width: 600px) {
-      .card { padding: 18px; }
-      .hero { min-height: 210px; }
-      .site-header { padding: 12px 4%; }
+      .card {
+        padding: 18px;
+      }
+
+      .hero {
+        min-height: 210px;
+      }
+
+      .site-header {
+        padding: 12px 4%;
+      }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- WEBSITE HEADER -->
   <header class="site-header">
     <img src="./niru-logo.png" alt="Niru Study Notes logo">
+
     <div>
       <h1>Niru Study Notes</h1>
       <p>Learn • Grow • Succeed</p>
@@ -173,104 +350,181 @@
   </header>
 
   <main>
+
+    <!-- WELCOME SECTION -->
     <section class="hero">
       <div class="hero-content">
-        <span class="eyebrow" style="color:white">YOUR LEARNING JOURNEY</span>
+        <span class="eyebrow" style="color:white">
+          YOUR LEARNING JOURNEY
+        </span>
+
         <h2>Welcome to Niru Study Notes</h2>
-        <p>Learn with confidence. Grow with knowledge. Build your future.</p>
+
+        <p>
+          Learn with confidence. Grow with knowledge. Build your future.
+        </p>
+
         <p>Study resources for B.Sc. PCM students.</p>
       </div>
     </section>
 
+    <!-- MUSIC -->
     <section class="card">
       <div class="section-heading">
         <div>
           <h2>A peaceful place to study</h2>
           <p class="muted">Enjoy music while you learn.</p>
         </div>
-        <button id="musicToggle" type="button" class="secondary">Play music</button>
+
+        <button id="musicToggle" type="button" class="secondary">
+          Play music
+        </button>
       </div>
-      <audio id="loginMusic" src="./login-song.mpeg" preload="none" loop></audio>
+
+      <audio
+        id="loginMusic"
+        src="./login-song.mpeg"
+        preload="none"
+        loop>
+      </audio>
     </section>
 
     <p id="message" class="message" role="status" aria-live="polite"></p>
 
-    <!-- LOGIN SCREEN: shown first -->
+    <!-- LOGIN SCREEN -->
     <section id="auth">
+
       <div id="loginScreen" class="card auth-card">
         <span class="eyebrow">WELCOME BACK</span>
+
         <h2>Student Login</h2>
-        <p class="muted">Already have an account? Sign in below.</p>
+
+        <p class="muted">
+          Already have an account? Sign in below.
+        </p>
 
         <form id="login">
-          <label for="loginEmail">Email address
-            <input id="loginEmail" name="email" type="email"
-              autocomplete="email" required placeholder="Enter your email">
+          <label for="loginEmail">
+            Email address
+
+            <input
+              id="loginEmail"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="Enter your email">
           </label>
 
-          <label for="loginPassword">Password
-            <input id="loginPassword" name="password" type="password"
-              autocomplete="current-password" required minlength="6"
+          <label for="loginPassword">
+            Password
+
+            <input
+              id="loginPassword"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="6"
               placeholder="Enter your password">
           </label>
 
           <label style="display:flex;align-items:center;gap:8px;font-weight:normal">
-            <input type="checkbox" data-toggle-password="loginPassword" style="width:auto">
+            <input
+              type="checkbox"
+              data-toggle-password="loginPassword"
+              style="width:auto">
+
             Show password
           </label>
 
-          <button type="submit" class="full-button">Sign In</button>
+          <button type="submit" class="full-button">
+            Sign In
+          </button>
         </form>
 
         <p class="muted" style="text-align:center;margin-top:22px">
           New student? Create an account to get started.
         </p>
+
         <button id="openRegister" type="button" class="screen-link">
           Create an Account
         </button>
       </div>
 
-      <!-- REGISTRATION SCREEN: shown after clicking Create an Account -->
+      <!-- REGISTRATION SCREEN -->
       <div id="registerScreen" class="card auth-card hidden">
         <span class="eyebrow">JOIN OUR LEARNING COMMUNITY</span>
+
         <h2>Create Your Account</h2>
+
         <p class="muted">
           Enter your details below. After registration, your account will
           wait for administrator approval.
         </p>
 
         <form id="signup">
-          <label for="name">Full name
-            <input id="name" name="name" type="text" autocomplete="name"
-              required maxlength="100" placeholder="Enter your full name">
+          <label for="name">
+            Full name
+
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              maxlength="100"
+              placeholder="Enter your full name">
           </label>
 
-          <label for="signupEmail">Email address
-            <input id="signupEmail" name="email" type="email"
-              autocomplete="email" required placeholder="Enter your email">
+          <label for="signupEmail">
+            Email address
+
+            <input
+              id="signupEmail"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="Enter your email">
           </label>
 
-          <label for="signupPassword">Create password
-            <input id="signupPassword" name="password" type="password"
-              autocomplete="new-password" required minlength="6"
+          <label for="signupPassword">
+            Create password
+
+            <input
+              id="signupPassword"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="6"
               placeholder="At least 6 characters">
           </label>
 
           <label style="display:flex;align-items:center;gap:8px;font-weight:normal">
-            <input type="checkbox" data-toggle-password="signupPassword" style="width:auto">
+            <input
+              type="checkbox"
+              data-toggle-password="signupPassword"
+              style="width:auto">
+
             Show password
           </label>
 
-          <button type="submit" class="full-button">Create Your Account</button>
+          <button type="submit" class="full-button">
+            Create Your Account
+          </button>
         </form>
 
         <p class="muted" style="text-align:center;margin-top:22px">
           Already registered? Return to the login screen.
         </p>
+
         <button id="openLogin" type="button" class="screen-link">
           Back to Login
         </button>
       </div>
+
     </section>
 
     <!-- SIGNED-IN ACCOUNT -->
@@ -278,23 +532,40 @@
       <div class="account-line">
         <div>
           <span class="eyebrow">YOUR ACCOUNT</span>
+
           <h2 id="welcome">Welcome</h2>
+
           <p id="email" class="muted"></p>
         </div>
-        <button id="logout" type="button" class="secondary">Sign Out</button>
+
+        <button id="logout" type="button" class="secondary">
+          Sign Out
+        </button>
       </div>
+
       <p id="studentStatus" role="status" aria-live="polite"></p>
     </section>
 
     <!-- STUDENT LIBRARY -->
     <section id="materials" class="card hidden">
       <span class="eyebrow">YOUR STUDY SPACE</span>
-      <h2>Study Library</h2>
-      <p class="muted">Choose a semester to find your resources.</p>
 
-      <div id="semesterFilters" class="semester-filters" role="group"
+      <h2>Study Library</h2>
+
+      <p class="muted">
+        Choose a semester to find your resources.
+      </p>
+
+      <div
+        id="semesterFilters"
+        class="semester-filters"
+        role="group"
         aria-label="Filter by semester">
-        <button type="button" data-semester="all" class="active">All</button>
+
+        <button type="button" data-semester="all" class="active">
+          All
+        </button>
+
         <button type="button" data-semester="1">Semester 1</button>
         <button type="button" data-semester="2">Semester 2</button>
         <button type="button" data-semester="3">Semester 3</button>
@@ -308,28 +579,56 @@
       </div>
     </section>
 
-    <!-- ADMIN PANEL -->
+    <!-- ADMIN PANEL: visible only to the configured administrator -->
     <section id="admin" class="card hidden">
+
       <div class="section-heading">
         <div>
           <span class="eyebrow">ADMINISTRATOR PANEL</span>
+
           <h2>Student Management</h2>
-          <p class="muted">Review registrations and manage resources.</p>
+
+          <p class="muted">
+            Review registrations and manage resources.
+          </p>
         </div>
-        <button id="refresh" class="secondary" type="button">Refresh list</button>
+
+        <button id="refresh" class="secondary" type="button">
+          Refresh list
+        </button>
       </div>
 
       <div class="count-line">
         <span id="count" aria-live="polite">Loading accounts…</span>
       </div>
 
-      <div class="student-status-tabs" role="group" aria-label="Filter students">
-        <button type="button" data-user-status="pending" class="active"
-          aria-pressed="true">Pending</button>
-        <button type="button" data-user-status="approved"
-          aria-pressed="false">Approved</button>
-        <button type="button" data-user-status="rejected"
-          aria-pressed="false">Rejected</button>
+      <!-- STUDENT STATUS FILTERS -->
+      <div
+        class="student-status-tabs"
+        role="group"
+        aria-label="Filter students">
+
+        <button
+          type="button"
+          data-user-status="pending"
+          class="active"
+          aria-pressed="true">
+          Pending
+        </button>
+
+        <button
+          type="button"
+          data-user-status="approved"
+          aria-pressed="false">
+          Approved
+        </button>
+
+        <button
+          type="button"
+          data-user-status="rejected"
+          aria-pressed="false">
+          Rejected
+        </button>
       </div>
 
       <div id="users" aria-live="polite" aria-busy="false">
@@ -338,16 +637,29 @@
 
       <hr class="section-rule">
 
+      <!-- ADD STUDY MATERIAL -->
       <h2>Add Study Material</h2>
-      <p class="muted">Publish a PDF for your students.</p>
+
+      <p class="muted">
+        Publish a PDF for your students.
+      </p>
 
       <form id="addNoteForm" class="note-form">
-        <label for="noteTitle">PDF title
-          <input id="noteTitle" name="noteTitle" type="text" required
-            maxlength="150" placeholder="Laws of Thermodynamics">
+        <label for="noteTitle">
+          PDF title
+
+          <input
+            id="noteTitle"
+            name="noteTitle"
+            type="text"
+            required
+            maxlength="150"
+            placeholder="Laws of Thermodynamics">
         </label>
 
-        <label for="noteSemester">Semester
+        <label for="noteSemester">
+          Semester
+
           <select id="noteSemester" name="noteSemester" required>
             <option value="">Choose semester</option>
             <option value="1">Semester 1</option>
@@ -359,45 +671,79 @@
           </select>
         </label>
 
-        <label for="noteUrl">PDF URL
-          <input id="noteUrl" name="noteUrl" type="url" required
+        <label for="noteUrl">
+          PDF URL
+
+          <input
+            id="noteUrl"
+            name="noteUrl"
+            type="url"
+            required
             placeholder="https://drive.google.com/...">
-          <span class="help-text">Students must have permission to access restricted Drive files.</span>
+
+          <span class="help-text">
+            Students must have permission to access restricted Drive files.
+          </span>
         </label>
 
-        <button type="submit" class="full-button">Add PDF to Library</button>
+        <button type="submit" class="full-button">
+          Add PDF to Library
+        </button>
       </form>
 
-      <p id="noteAdminMessage" class="message" role="status" aria-live="polite"></p>
+      <p
+        id="noteAdminMessage"
+        class="message"
+        role="status"
+        aria-live="polite">
+      </p>
 
+      <!-- EXISTING PDF MANAGEMENT -->
       <div class="admin-existing-heading">
         <h3>Existing Study Materials</h3>
       </div>
+
       <div id="adminNotes" aria-live="polite">
         <p>Loading PDFs…</p>
       </div>
-    </section>
-    
-      <!-- ADDITION: Login Time -->
+
+      <!-- LOGIN HISTORY: NOW INSIDE ADMIN PANEL -->
       <hr class="section-rule">
 
       <h2>Login Time</h2>
-      <p class="muted">View student login activity and recorded history.</p>
 
-      <button id="loginTimeButton" type="button" class="full-button">
+      <p class="muted">
+        View student login activity and recorded history.
+      </p>
+
+      <button
+        id="loginTimeButton"
+        type="button"
+        class="full-button">
         View Login Time
       </button>
 
-      <div id="loginTimeMessage" class="message" role="status"></div>
+      <div
+        id="loginTimeMessage"
+        class="message"
+        role="status">
+      </div>
+
       <div id="loginTimeStudents"></div>
+
+    </section>
 
   </main>
 
+  <!-- FOOTER -->
   <footer>
-    <p>© <span id="year"></span> Niru Study Notes. Learn something new every day.</p>
+    <p>
+      © <span id="year"></span> Niru Study Notes.
+      Learn something new every day.
+    </p>
   </footer>
 
-  <!-- Screen switching, password visibility and music -->
+  <!-- SCREEN SWITCHING, PASSWORD VISIBILITY AND MUSIC -->
   <script>
     const loginScreen = document.getElementById("loginScreen");
     const registerScreen = document.getElementById("registerScreen");
@@ -405,21 +751,36 @@
     document.getElementById("openRegister").addEventListener("click", function () {
       loginScreen.classList.add("hidden");
       registerScreen.classList.remove("hidden");
+
       document.getElementById("message").textContent = "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     });
 
     document.getElementById("openLogin").addEventListener("click", function () {
       registerScreen.classList.add("hidden");
       loginScreen.classList.remove("hidden");
+
       document.getElementById("message").textContent = "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     });
 
     document.querySelectorAll("[data-toggle-password]").forEach(function (toggle) {
       toggle.addEventListener("change", function () {
-        const field = document.getElementById(toggle.dataset.togglePassword);
-        if (field) field.type = toggle.checked ? "text" : "password";
+        const field = document.getElementById(
+          toggle.dataset.togglePassword
+        );
+
+        if (field) {
+          field.type = toggle.checked ? "text" : "password";
+        }
       });
     });
 
@@ -442,7 +803,8 @@
     });
   </script>
 
-  <!-- Your existing Firebase application -->
+  <!-- FIREBASE APPLICATION -->
   <script type="module" src="./app.js"></script>
+
 </body>
 </html>
