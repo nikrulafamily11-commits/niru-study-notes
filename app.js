@@ -37,7 +37,7 @@ import {
 // ========================================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDaMLePSVjVJetQsSvDDgp7XiczIfHSBQU",
+  apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
   authDomain: "niru-study-portal.firebaseapp.com",
   databaseURL: "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "niru-study-portal",
