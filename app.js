@@ -171,7 +171,7 @@ $("login").addEventListener("submit", async e => {
       $("loginPassword").value
     );
 
-    // Record successful sign-in in Firestore
+    // Record each successful login in Firestore
     try {
       await addDoc(collection(db, "loginHistory"), {
         userId: credential.user.uid,
@@ -185,7 +185,7 @@ $("login").addEventListener("submit", async e => {
         "success"
       );
     } catch (historyError) {
-      // Authentication succeeded, even if the history write failed
+      // Authentication worked, but Firestore did not save the event
       console.error("Could not save login history:", historyError);
 
       $("login").reset();
@@ -837,7 +837,6 @@ async function loadAdminNotes() {
 // ========================================
 
 async function render(user) {
-  // Admin panel includes the Login Time section in the edited HTML.
   visible("auth", !user);
   visible("account", !!user);
   visible("admin", isAdmin(user));
@@ -947,7 +946,6 @@ const loginTimeButton =
 
 if (loginTimeButton) {
   loginTimeButton.addEventListener("click", () => {
-    // Check the signed-in account before opening history
     if (!isAdmin(auth.currentUser)) {
       message(
         "Administrator access required.",
