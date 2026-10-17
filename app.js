@@ -39,24 +39,22 @@ import {
 const firebaseConfig = {
   apiKey: "AIzaSyDaMLePSVjVJetQsSvDDgp7XiczIfHSBQU",
   authDomain: "niru-study-portal.firebaseapp.com",
+  databaseURL: "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "niru-study-portal",
   storageBucket: "niru-study-portal.firebasestorage.app",
   messagingSenderId: "476816671743",
-  appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
+  appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca",
+  measurementId: "G-EJBB8TG1WJ"
 };
 
 // Administrator UID
 const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
 // Initialize Firebase services
-const app = initializeApp(npm install firebase);
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-const rtdb = getDatabase(
-  app,
-  "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app"
-);
+const rtdb = getDatabase(app);
 
 // ========================================
 // GENERAL HELPERS
@@ -64,15 +62,21 @@ const rtdb = getDatabase(
 
 const $ = id => document.getElementById(id);
 
-$("year").textContent = new Date().getFullYear();
+if ($("year")) {
+  $("year").textContent = new Date().getFullYear();
+}
 
 let activeSemester = "all";
 let activeUserStatus = "pending";
 let currentProfile = null;
 
 function message(text, type = "") {
-  $("message").textContent = text;
-  $("message").className = "message " + type;
+  const messageElement = $("message");
+
+  if (!messageElement) return;
+
+  messageElement.textContent = text;
+  messageElement.className = "message " + type;
 }
 
 function errorText(e) {
@@ -99,8 +103,13 @@ function errorText(e) {
   return known[e.code] || e.message || "Something went wrong.";
 }
 
-const visible = (id, on) =>
-  $(id).classList.toggle("hidden", !on);
+const visible = (id, on) => {
+  const element = $(id);
+
+  if (element) {
+    element.classList.toggle("hidden", !on);
+  }
+};
 
 const isAdmin = user =>
   !!user && user.uid === ADMIN_UID;
@@ -131,7 +140,7 @@ function safeUrl(raw) {
 let presenceUnsubscribe = null;
 
 function startPresenceTracking(user) {
-  // Remove the previous connection listener, if any.
+  // Stop the previous connection listener.
   if (presenceUnsubscribe) {
     presenceUnsubscribe();
     presenceUnsubscribe = null;
@@ -145,17 +154,16 @@ function startPresenceTracking(user) {
   presenceUnsubscribe = onValue(
     connectedRef,
     async snapshot => {
-      // Firebase reports whether this browser is connected.
       if (snapshot.val() !== true) return;
 
       try {
-        // Register an offline update in case this connection drops.
+        // If the connection drops, Firebase will mark this user offline.
         await onDisconnect(presenceRef).set({
           state: "offline",
           lastChanged: rtdbServerTimestamp()
         });
 
-        // Mark this account online.
+        // Mark the user online while this connection is active.
         await set(presenceRef, {
           state: "online",
           lastChanged: rtdbServerTimestamp()
@@ -174,131 +182,146 @@ function startPresenceTracking(user) {
 // STUDENT REGISTRATION
 // ========================================
 
-$("signup").addEventListener("submit", async e => {
-  e.preventDefault();
+if ($("signup")) {
+  $("signup").addEventListener("submit", async e => {
+    e.preventDefault();
 
-  const form = e.currentTarget;
-  const btn = form.querySelector('button[type="submit"]');
+    const form = e.currentTarget;
+    const btn = form.querySelector('button[type="submit"]');
 
-  btn.disabled = true;
+    btn.disabled = true;
 
-  try {
-    const name = $("name").value.trim();
-    const email = $("signupEmail").value.trim();
-    const password = $("signupPassword").value;
+    try {
+      const name = $("name").value.trim();
+      const email = $("signupEmail").value.trim();
+      const password = $("signupPassword").value;
 
-    const cred = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    await setDoc(doc(db, "users", cred.user.uid), {
-      name,
-      email,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
+      await setDoc(doc(db, "users", cred.user.uid), {
+        name,
+        email,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
 
-    form.reset();
+      form.reset();
 
-    message(
-      "Account created. Your account is waiting for administrator approval.",
-      "success"
-    );
-  } catch (err) {
-    message(errorText(err), "error");
-  } finally {
-    btn.disabled = false;
-  }
-});
+      message(
+        "Account created. Your account is waiting for administrator approval.",
+        "success"
+      );
+    } catch (err) {
+      message(errorText(err), "error");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
 
 // ========================================
 // STUDENT LOGIN + LOGIN HISTORY
 // ========================================
 
-$("login").addEventListener("submit", async e => {
-  e.preventDefault();
+if ($("login")) {
+  $("login").addEventListener("submit", async e => {
+    e.preventDefault();
 
-  const btn = e.currentTarget.querySelector('button[type="submit"]');
-  btn.disabled = true;
+    const btn = e.currentTarget.querySelector('button[type="submit"]');
+    btn.disabled = true;
 
-  try {
-    const credential = await signInWithEmailAndPassword(
-      auth,
-      $("loginEmail").value.trim(),
-      $("loginPassword").value
-    );
-
-    // Record each successful login in Firestore.
     try {
-      await addDoc(collection(db, "loginHistory"), {
-        userId: credential.user.uid,
-        loginAt: serverTimestamp()
-      });
-
-      $("login").reset();
-
-      message(
-        "Signed in successfully. Login time recorded.",
-        "success"
-      );
-    } catch (historyError) {
-      console.error(
-        "Could not save login history:",
-        historyError
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        $("loginEmail").value.trim(),
+        $("loginPassword").value
       );
 
-      $("login").reset();
+      // Record each successful login in Firestore.
+      try {
+        await addDoc(collection(db, "loginHistory"), {
+          userId: credential.user.uid,
+          loginAt: serverTimestamp()
+        });
 
-      message(
-        "Signed in successfully, but login time could not be saved. Check Firestore rules.",
-        "error"
-      );
+        $("login").reset();
+
+        message(
+          "Signed in successfully. Login time recorded.",
+          "success"
+        );
+      } catch (historyError) {
+        console.error(
+          "Could not save login history:",
+          historyError
+        );
+
+        $("login").reset();
+
+        message(
+          "Signed in successfully, but login time could not be saved. Check Firestore rules.",
+          "error"
+        );
+      }
+    } catch (err) {
+      message(errorText(err), "error");
+    } finally {
+      btn.disabled = false;
     }
-  } catch (err) {
-    message(errorText(err), "error");
-  } finally {
-    btn.disabled = false;
-  }
-});
+  });
+}
 
 // ========================================
 // LOGOUT
 // ========================================
 
-$("logout").addEventListener("click", async () => {
-  try {
+if ($("logout")) {
+  $("logout").addEventListener("click", async () => {
     const user = auth.currentUser;
 
-    // Mark the user offline when they deliberately sign out.
-    if (user) {
-      await set(ref(rtdb, `presence/${user.uid}`), {
-        state: "offline",
-        lastChanged: rtdbServerTimestamp()
-      });
-    }
+    try {
+      // Try to mark the user offline before signing out.
+      if (user) {
+        try {
+          await set(ref(rtdb, `presence/${user.uid}`), {
+            state: "offline",
+            lastChanged: rtdbServerTimestamp()
+          });
+        } catch (presenceError) {
+          console.error(
+            "Could not mark user offline during logout:",
+            presenceError
+          );
+        }
+      }
 
-    await signOut(auth);
-    message("Signed out.");
-  } catch (e) {
-    message(errorText(e), "error");
-  }
-});
+      await signOut(auth);
+      message("Signed out.");
+    } catch (e) {
+      message(errorText(e), "error");
+    }
+  });
+}
 
 // ========================================
 // ADMIN REFRESH
 // ========================================
 
-$("refresh").addEventListener("click", async () => {
-  if (!isAdmin(auth.currentUser)) {
-    message("Administrator access required.", "error");
-    return;
-  }
+if ($("refresh")) {
+  $("refresh").addEventListener("click", async () => {
+    if (!isAdmin(auth.currentUser)) {
+      message("Administrator access required.", "error");
+      return;
+    }
 
-  await loadUsers();
-  await loadAdminNotes();
-});
+    await loadUsers();
+    await loadAdminNotes();
+  });
+}
 
 // ========================================
 // STUDENT STATUS TABS
@@ -330,77 +353,81 @@ document.querySelectorAll("[data-user-status]").forEach(button => {
 // ADD A STUDY PDF
 // ========================================
 
-$("addNoteForm").addEventListener("submit", async e => {
-  e.preventDefault();
+if ($("addNoteForm")) {
+  $("addNoteForm").addEventListener("submit", async e => {
+    e.preventDefault();
 
-  const form = e.currentTarget;
-  const btn = form.querySelector('button[type="submit"]');
+    const form = e.currentTarget;
+    const btn = form.querySelector('button[type="submit"]');
 
-  if (!isAdmin(auth.currentUser)) {
-    $("noteAdminMessage").textContent =
-      "Only the administrator can add PDFs.";
+    if (!isAdmin(auth.currentUser)) {
+      $("noteAdminMessage").textContent =
+        "Only the administrator can add PDFs.";
 
-    $("noteAdminMessage").className = "message error";
-    return;
-  }
-
-  btn.disabled = true;
-
-  try {
-    const title = $("noteTitle").value.trim();
-    const semester = Number($("noteSemester").value);
-    const url = safeUrl($("noteUrl").value.trim());
-
-    if (!url) {
-      throw new Error("Enter a valid http or https PDF link.");
+      $("noteAdminMessage").className = "message error";
+      return;
     }
 
-    if (!Number.isInteger(semester) || semester < 1 || semester > 6) {
-      throw new Error("Choose a semester from 1 to 6.");
+    btn.disabled = true;
+
+    try {
+      const title = $("noteTitle").value.trim();
+      const semester = Number($("noteSemester").value);
+      const url = safeUrl($("noteUrl").value.trim());
+
+      if (!url) {
+        throw new Error("Enter a valid http or https PDF link.");
+      }
+
+      if (!Number.isInteger(semester) || semester < 1 || semester > 6) {
+        throw new Error("Choose a semester from 1 to 6.");
+      }
+
+      await addDoc(collection(db, "notes"), {
+        title,
+        semester,
+        url,
+        createdAt: serverTimestamp(),
+        createdBy: auth.currentUser.uid
+      });
+
+      form.reset();
+
+      $("noteAdminMessage").textContent =
+        "PDF added to the study library.";
+
+      $("noteAdminMessage").className = "message success";
+
+      await loadAdminNotes();
+      await loadStudentNotes();
+    } catch (err) {
+      $("noteAdminMessage").textContent = errorText(err);
+      $("noteAdminMessage").className = "message error";
+    } finally {
+      btn.disabled = false;
     }
-
-    await addDoc(collection(db, "notes"), {
-      title,
-      semester,
-      url,
-      createdAt: serverTimestamp(),
-      createdBy: auth.currentUser.uid
-    });
-
-    form.reset();
-
-    $("noteAdminMessage").textContent =
-      "PDF added to the study library.";
-
-    $("noteAdminMessage").className = "message success";
-
-    await loadAdminNotes();
-    await loadStudentNotes();
-  } catch (err) {
-    $("noteAdminMessage").textContent = errorText(err);
-    $("noteAdminMessage").className = "message error";
-  } finally {
-    btn.disabled = false;
-  }
-});
+  });
+}
 
 // ========================================
 // SEMESTER FILTERS
 // ========================================
 
-$("semesterFilters").addEventListener("click", async e => {
-  const btn = e.target.closest("button[data-semester]");
+if ($("semesterFilters")) {
+  $("semesterFilters").addEventListener("click", async e => {
+    const btn = e.target.closest("button[data-semester]");
 
-  if (!btn) return;
+    if (!btn) return;
 
-  activeSemester = btn.dataset.semester;
+    activeSemester = btn.dataset.semester;
 
-  $("semesterFilters").querySelectorAll("button").forEach(b => {
-    b.classList.toggle("active", b === btn);
+    $("semesterFilters").querySelectorAll("button").forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
+
+    await loadStudentNotes();
   });
-
-  await loadStudentNotes();
-});
+}
 
 // ========================================
 // ADMIN: LOAD AND MANAGE STUDENTS
@@ -416,6 +443,8 @@ async function loadUsers() {
   }
 
   const root = $("users");
+
+  if (!root) return;
 
   root.replaceChildren(
     document.createTextNode("Loading accounts…")
@@ -469,8 +498,10 @@ async function loadUsers() {
       }
     });
 
-    $("count").textContent =
-      `Pending: ${counts.pending} · Approved: ${counts.approved} · Rejected: ${counts.rejected}`;
+    if ($("count")) {
+      $("count").textContent =
+        `Pending: ${counts.pending} · Approved: ${counts.approved} · Rejected: ${counts.rejected}`;
+    }
 
     root.replaceChildren();
 
@@ -503,7 +534,6 @@ async function loadUsers() {
       email.textContent = u.email || "";
 
       const state = document.createElement("span");
-
       state.textContent =
         u.status.charAt(0).toUpperCase() + u.status.slice(1);
 
@@ -692,7 +722,6 @@ function buildPdfCard(note) {
     info.append(link);
   } else {
     const invalid = document.createElement("p");
-
     invalid.textContent = "PDF link unavailable.";
 
     info.append(invalid);
@@ -727,6 +756,8 @@ async function getNotes() {
 
 async function loadStudentNotes() {
   const root = $("notesList");
+
+  if (!root) return;
 
   root.replaceChildren(
     document.createTextNode("Loading study PDFs…")
@@ -795,6 +826,8 @@ async function loadStudentNotes() {
 
 async function loadAdminNotes() {
   const root = $("adminNotes");
+
+  if (!root) return;
 
   if (!isAdmin(auth.currentUser)) {
     root.replaceChildren();
@@ -889,7 +922,6 @@ async function loadAdminNotes() {
       actions.append(del);
 
       row.append(info, actions);
-
       root.append(row);
     });
   } catch (e) {
@@ -916,24 +948,30 @@ async function render(user) {
   currentProfile = null;
 
   if (!user) {
-    $("users").replaceChildren();
-    $("adminNotes").replaceChildren();
-    $("count").textContent = "";
-    $("studentStatus").textContent = "";
+    if ($("users")) $("users").replaceChildren();
+    if ($("adminNotes")) $("adminNotes").replaceChildren();
+    if ($("count")) $("count").textContent = "";
+    if ($("studentStatus")) $("studentStatus").textContent = "";
     return;
   }
 
-  $("email").textContent = user.email || "";
+  if ($("email")) {
+    $("email").textContent = user.email || "";
+  }
 
-  $("welcome").textContent = isAdmin(user)
-    ? "Administrator account"
-    : "Your student account";
+  if ($("welcome")) {
+    $("welcome").textContent = isAdmin(user)
+      ? "Administrator account"
+      : "Your student account";
+  }
 
   try {
     // Administrator account.
     if (isAdmin(user)) {
-      $("studentStatus").textContent =
-        "Administrator access configured.";
+      if ($("studentStatus")) {
+        $("studentStatus").textContent =
+          "Administrator access configured.";
+      }
 
       message(
         "Signed in as administrator.",
@@ -955,8 +993,10 @@ async function render(user) {
     );
 
     if (!snap.exists()) {
-      $("studentStatus").textContent =
-        "Your account profile was not found. Please contact the administrator.";
+      if ($("studentStatus")) {
+        $("studentStatus").textContent =
+          "Your account profile was not found. Please contact the administrator.";
+      }
 
       message(
         "Profile not found. If you just registered, check Firestore permissions.",
@@ -969,8 +1009,10 @@ async function render(user) {
     currentProfile = snap.data();
 
     if (currentProfile.status === "approved") {
-      $("studentStatus").textContent =
-        "Your account is approved. You can access the study library below.";
+      if ($("studentStatus")) {
+        $("studentStatus").textContent =
+          "Your account is approved. You can access the study library below.";
+      }
 
       visible("materials", true);
 
@@ -981,16 +1023,20 @@ async function render(user) {
 
       await loadStudentNotes();
     } else if (currentProfile.status === "rejected") {
-      $("studentStatus").textContent =
-        "Your registration was not approved. Please contact the administrator if you think this is a mistake.";
+      if ($("studentStatus")) {
+        $("studentStatus").textContent =
+          "Your registration was not approved. Please contact the administrator if you think this is a mistake.";
+      }
 
       message(
         "Registration not approved.",
         "error"
       );
     } else {
-      $("studentStatus").textContent =
-        "Your account is waiting for administrator approval.";
+      if ($("studentStatus")) {
+        $("studentStatus").textContent =
+          "Your account is waiting for administrator approval.";
+      }
 
       message(
         "Signed in. Waiting for approval."
@@ -1005,8 +1051,6 @@ async function render(user) {
 // AUTHENTICATION LISTENER
 // ========================================
 
-// Start presence tracking whenever Firebase reports a signed-in user.
-// This also handles restored login sessions after page reload.
 onAuthStateChanged(auth, user => {
   startPresenceTracking(user);
 
@@ -1019,5 +1063,23 @@ onAuthStateChanged(auth, user => {
 // LOGIN TIME BUTTON
 // ========================================
 
-const loginTimeButton =
-  document
+const loginTimeButton = $("loginTimeButton");
+
+if (loginTimeButton) {
+  loginTimeButton.addEventListener("click", () => {
+    if (!isAdmin(auth.currentUser)) {
+      message(
+        "Administrator access required.",
+        "error"
+      );
+
+      return;
+    }
+
+    window.open(
+      "./login-history.html",
+      "_blank",
+      "noopener"
+    );
+  });
+}
