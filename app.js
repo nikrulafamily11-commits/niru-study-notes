@@ -154,26 +154,47 @@ $("signup").addEventListener("submit", async e => {
 });
 
 // ========================================
-// STUDENT LOGIN
+// STUDENT LOGIN + LOGIN HISTORY
 // ========================================
 
 $("login").addEventListener("submit", async e => {
   e.preventDefault();
 
   const btn = e.currentTarget.querySelector('button[type="submit"]');
-
   btn.disabled = true;
 
   try {
-    await signInWithEmailAndPassword(
+    // Sign in with Firebase Authentication
+    const credential = await signInWithEmailAndPassword(
       auth,
       $("loginEmail").value.trim(),
       $("loginPassword").value
     );
 
-    $("login").reset();
+    // Record successful sign-in in Firestore
+    try {
+      await addDoc(collection(db, "loginHistory"), {
+        userId: credential.user.uid,
+        loginAt: serverTimestamp()
+      });
 
-    message("Signed in successfully.", "success");
+      $("login").reset();
+
+      message(
+        "Signed in successfully. Login time recorded.",
+        "success"
+      );
+    } catch (historyError) {
+      // Authentication succeeded, even if the history write failed
+      console.error("Could not save login history:", historyError);
+
+      $("login").reset();
+
+      message(
+        "Signed in successfully, but login time could not be saved. Check Firestore rules.",
+        "error"
+      );
+    }
   } catch (err) {
     message(errorText(err), "error");
   } finally {
