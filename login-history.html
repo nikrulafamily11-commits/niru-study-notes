@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Student Login History | Niru Study Notes</title>
 
   <style>
@@ -13,250 +13,444 @@
 
     body {
       margin: 0;
-      padding: 24px;
-      font-family: Arial, sans-serif;
+      padding: 20px;
       background: #f1f5fb;
-      color: #1b2b49;
+      color: #1f2937;
+      font-family: Arial, sans-serif;
     }
 
-    .container {
-      max-width: 950px;
+    main {
+      max-width: 1000px;
       margin: 0 auto;
+      padding: 22px;
       background: white;
-      padding: 28px;
-      border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(20, 50, 90, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 5px 22px rgba(0, 0, 0, 0.07);
     }
 
     h1 {
       margin-top: 0;
-      color: #1456c5;
+      color: #145da0;
+      font-size: 25px;
     }
 
-    .notice {
+    h2 {
+      margin-top: 24px;
+      font-size: 20px;
+    }
+
+    .muted {
       color: #64748b;
-      line-height: 1.5;
+      font-size: 14px;
     }
 
-    .actions {
+    .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin: 22px 0;
+      gap: 10px;
+      margin: 18px 0;
     }
 
-    button, .back-link {
+    button, a.button {
+      display: inline-block;
       border: 0;
-      border-radius: 9px;
-      padding: 12px 18px;
-      font-size: 15px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    button {
-      background: #1456d9;
+      border-radius: 7px;
+      padding: 10px 14px;
+      background: #1769c2;
       color: white;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
     }
 
-    .back-link {
-      background: #eaf1ff;
-      color: #1456c5;
+    button.secondary, a.secondary {
+      background: #e8f1fb;
+      color: #145da0;
     }
 
-    #status {
-      margin: 16px 0;
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .message {
+      margin: 12px 0;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .student-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .student-card {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #dbe5f0;
+      border-radius: 10px;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .student-card:hover {
+      border-color: #1769c2;
+      background: #f8fbff;
+    }
+
+    .student-name {
+      display: block;
+      margin-bottom: 5px;
+      color: #145da0;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .student-email, .last-login, .online-note {
+      display: block;
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
       color: #64748b;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 18px;
-    }
-
-    th, td {
-      padding: 14px 12px;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-      overflow-wrap: anywhere;
-    }
-
-    th {
-      background: #f5f8ff;
-      color: #334155;
+    .online-note {
+      color: #9a6700;
     }
 
     .hidden {
       display: none !important;
     }
 
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5eaf1;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f2f6fc;
+      color: #334155;
+    }
+
+    .empty {
+      padding: 18px;
+      color: #64748b;
+      text-align: center;
+    }
+
     @media (max-width: 600px) {
       body {
-        padding: 12px;
+        padding: 10px;
       }
 
-      .container {
-        padding: 18px;
+      main {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      th, td {
+        padding: 10px 8px;
+        font-size: 13px;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="container">
-    <h1>Student Login History</h1>
+<main>
+  <h1>Student Login History</h1>
 
-    <p class="notice">
-      This page is for the Niru Study Notes administrator.
-      It displays login records saved in Firebase.
+  <p class="muted">
+    Administrator view: select a student to see their 15 most recent
+    recorded login events.
+  </p>
+
+  <div class="toolbar">
+    <a class="button secondary" href="./index.html">Back to website</a>
+    <button id="refreshButton">Refresh students</button>
+  </div>
+
+  <p id="statusMessage" class="message">Checking administrator access…</p>
+
+  <section id="studentSection" class="hidden">
+    <h2>Students</h2>
+    <p class="muted">
+      “Last login” means the most recent event recorded by the website.
+      This page does not yet track whether a student is currently online.
     </p>
+    <div id="studentList" class="student-list"></div>
+  </section>
 
-    <div class="actions">
-      <a class="back-link" href="./index.html">Back to website</a>
-      <button id="refreshButton" type="button">Refresh history</button>
+  <section id="historySection" class="hidden">
+    <div class="toolbar">
+      <button id="backButton" class="secondary">← Back to students</button>
     </div>
 
-    <p id="status">Checking administrator access…</p>
+    <h2 id="historyHeading">Login history</h2>
+    <p id="historySubheading" class="muted"></p>
 
-    <div id="historyArea" class="hidden">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Login date and time</th>
-              <th>User ID</th>
-            </tr>
-          </thead>
-          <tbody id="historyRows"></tbody>
-        </table>
-      </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Login date and time</th>
+            <th>User ID</th>
+          </tr>
+        </thead>
+        <tbody id="historyRows"></tbody>
+      </table>
     </div>
-  </main>
+    <p id="historyMessage" class="message"></p>
+  </section>
+</main>
 
-  <script type="module">
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+<script type="module">
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
-    import {
-      getAuth,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-    // Use the same Firebase project as your existing website.
-    const firebaseConfig = {
-      apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
-      authDomain: "niru-study-portal.firebaseapp.com",
-      projectId: "niru-study-portal",
-      storageBucket: "niru-study-portal.firebasestorage.app",
-      messagingSenderId: "476816671743",
-      appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
+    authDomain: "niru-study-portal.firebaseapp.com",
+    projectId: "niru-study-portal",
+    storageBucket: "niru-study-portal.firebasestorage.app",
+    messagingSenderId: "476816671743",
+    appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
+  };
 
-    // Must match the administrator UID used by your existing app.js.
-    const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
+  const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    const statusText = document.getElementById("status");
-    const historyArea = document.getElementById("historyArea");
-    const historyRows = document.getElementById("historyRows");
-    const refreshButton = document.getElementById("refreshButton");
+  const $ = id => document.getElementById(id);
 
-    let adminIsSignedIn = false;
+  let students = [];
+  let loginRecords = [];
 
-    function showStatus(text) {
-      statusText.textContent = text;
+  function showMessage(text) {
+    $("statusMessage").textContent = text;
+  }
+
+  function formatLoginTime(timestamp) {
+    if (!timestamp || typeof timestamp.toDate !== "function") {
+      return "Time unavailable";
     }
 
-    function formatLoginTime(value) {
-      if (!value || typeof value.toDate !== "function") {
-        return "Time not available";
-      }
+    return timestamp.toDate().toLocaleString();
+  }
 
-      return value.toDate().toLocaleString();
+  function showEmptyRow(text) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+
+    td.colSpan = 2;
+    td.className = "empty";
+    td.textContent = text;
+
+    tr.append(td);
+    return tr;
+  }
+
+  async function loadLoginData() {
+    showMessage("Loading student and login data…");
+    $("studentList").replaceChildren();
+
+    // Load registered student profiles
+    const usersSnapshot = await getDocs(collection(db, "users"));
+
+    students = usersSnapshot.docs.map(document => ({
+      uid: document.id,
+      ...document.data()
+    }));
+
+    // Load login records, newest first
+    // Then group them in the browser by student UID.
+    const historyQuery = query(
+      collection(db, "loginHistory"),
+      orderBy("loginAt", "desc")
+    );
+
+    const historySnapshot = await getDocs(historyQuery);
+
+    loginRecords = historySnapshot.docs.map(document => ({
+      id: document.id,
+      ...document.data()
+    }));
+
+    renderStudentList();
+    showMessage(`Loaded ${students.length} student account(s).`);
+    $("studentSection").classList.remove("hidden");
+    $("historySection").classList.add("hidden");
+  }
+
+  function renderStudentList() {
+    const root = $("studentList");
+    root.replaceChildren();
+
+    if (students.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "No student accounts found.";
+      root.append(empty);
+      return;
     }
 
-    async function loadHistory() {
-      if (!adminIsSignedIn) {
-        showStatus("Administrator access required.");
-        return;
-      }
+    students.sort((a, b) =>
+      String(a.name || a.email || "").localeCompare(
+        String(b.name || b.email || "")
+      )
+    );
 
-      refreshButton.disabled = true;
-      showStatus("Loading login records…");
-      historyRows.replaceChildren();
+    for (const student of students) {
+      const records = loginRecords.filter(
+        record => record.userId === student.uid
+      );
 
-      try {
-        const historyQuery = query(
-          collection(db, "loginHistory"),
-          orderBy("loginAt", "desc")
-        );
+      const latest = records.length ? records[0] : null;
 
-        const snapshot = await getDocs(historyQuery);
+      const card = document.createElement("button");
+      card.className = "student-card";
+      card.type = "button";
 
-        if (snapshot.empty) {
-          showStatus(
-            "No login records yet. The website must record successful sign-ins first."
-          );
-          historyArea.classList.add("hidden");
-          return;
-        }
+      const name = document.createElement("span");
+      name.className = "student-name";
+      name.textContent = student.name || "Student";
 
-        snapshot.forEach(documentSnapshot => {
-          const record = documentSnapshot.data();
+      const email = document.createElement("span");
+      email.className = "student-email";
+      email.textContent = student.email || "";
 
-          const row = document.createElement("tr");
-          const timeCell = document.createElement("td");
-          const userCell = document.createElement("td");
+      const lastLogin = document.createElement("span");
+      lastLogin.className = "last-login";
+      lastLogin.textContent = latest
+        ? `Last login: ${formatLoginTime(latest.loginAt)}`
+        : "Last login: No login record";
 
-          timeCell.textContent = formatLoginTime(record.loginAt);
-          userCell.textContent = record.userId || "User ID unavailable";
+      const onlineNote = document.createElement("span");
+      onlineNote.className = "online-note";
+      onlineNote.textContent = "Online status: not tracked";
 
-          row.append(timeCell, userCell);
-          historyRows.append(row);
-        });
+      card.append(name, email, lastLogin, onlineNote);
 
-        historyArea.classList.remove("hidden");
-        showStatus(`Loaded ${snapshot.size} login record(s).`);
-      } catch (error) {
-        console.error(error);
-        showStatus(
-          "Could not load records. Check that loginHistory exists and Firestore Rules allow the admin to read it."
-        );
-      } finally {
-        refreshButton.disabled = false;
+      card.addEventListener("click", () => {
+        openStudentHistory(student);
+      });
+
+      root.append(card);
+    }
+  }
+
+  function openStudentHistory(student) {
+    const records = loginRecords
+      .filter(record => record.userId === student.uid)
+      .slice(0, 15);
+
+    $("historyHeading").textContent =
+      `${student.name || "Student"} — Login history`;
+
+    $("historySubheading").textContent =
+      student.email || `User ID: ${student.uid}`;
+
+    const tbody = $("historyRows");
+    tbody.replaceChildren();
+
+    if (records.length === 0) {
+      tbody.append(showEmptyRow("No login events recorded for this student."));
+    } else {
+      for (const record of records) {
+        const tr = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = formatLoginTime(record.loginAt);
+
+        const uidCell = document.createElement("td");
+        uidCell.textContent = record.userId || student.uid;
+
+        tr.append(dateCell, uidCell);
+        tbody.append(tr);
       }
     }
 
-    refreshButton.addEventListener("click", loadHistory);
+    $("historyMessage").textContent =
+      `Showing ${records.length} most recent record(s), up to 15.`;
 
-    onAuthStateChanged(auth, user => {
-      if (!user || user.uid !== ADMIN_UID) {
-        adminIsSignedIn = false;
-        historyArea.classList.add("hidden");
-        showStatus("Admin sign-in required. Return to the website and sign in as the administrator.");
-        return;
-      }
+    $("studentSection").classList.add("hidden");
+    $("historySection").classList.remove("hidden");
+  }
 
-      adminIsSignedIn = true;
-      loadHistory();
-    });
-  </script>
+  $("refreshButton").addEventListener("click", async () => {
+    try {
+      await loadLoginData();
+    } catch (error) {
+      console.error(error);
+      showMessage("Could not load data. Check Firestore rules and browser Console.");
+    }
+  });
+
+  $("backButton").addEventListener("click", () => {
+    $("historySection").classList.add("hidden");
+    $("studentSection").classList.remove("hidden");
+  });
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      showMessage("Please sign in as the administrator on the main website, then open this page again.");
+      $("studentSection").classList.add("hidden");
+      $("historySection").classList.add("hidden");
+      return;
+    }
+
+    if (user.uid !== ADMIN_UID) {
+      showMessage("Administrator access required.");
+      $("studentSection").classList.add("hidden");
+      $("historySection").classList.add("hidden");
+      return;
+    }
+
+    try {
+      await loadLoginData();
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        "Could not load login history. Confirm Firestore rules allow the admin to read users and loginHistory."
+      );
+    }
+  });
+</script>
 </body>
 </html>
