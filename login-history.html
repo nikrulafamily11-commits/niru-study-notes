@@ -6,7 +6,10 @@
   <title>Student Login History | Niru Study Notes</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 18px;
@@ -14,75 +17,207 @@
       color: #1f2937;
       font-family: Arial, sans-serif;
     }
+
     main {
-      max-width: 950px;
+      max-width: 1000px;
       margin: auto;
-      padding: 20px;
-      background: white;
+      padding: 22px;
+      background: #fff;
       border-radius: 14px;
       box-shadow: 0 5px 22px #00000012;
     }
-    h1 { color: #145da0; font-size: 24px; }
-    h2 { font-size: 20px; }
-    .muted, .message { color: #64748b; font-size: 14px; }
+
+    h1 {
+      color: #145da0;
+      font-size: 25px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .muted,
+    .message {
+      color: #64748b;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
     .toolbar {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin: 16px 0;
     }
-    button, .button {
+
+    button,
+    .button {
       border: 0;
       border-radius: 7px;
       padding: 10px 14px;
       background: #1769c2;
-      color: white;
+      color: #fff;
       font-size: 14px;
       cursor: pointer;
       text-decoration: none;
     }
-    .secondary { background: #e8f1fb; color: #145da0; }
-    button:disabled { opacity: .6; cursor: wait; }
-    .student-list { display: grid; gap: 10px; }
-    .student-card {
-      width: 100%;
-      padding: 14px;
+
+    .secondary {
+      background: #e8f1fb;
+      color: #145da0;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .summary-card {
+      padding: 16px;
       border: 1px solid #dbe5f0;
       border-radius: 10px;
-      background: white;
+      background: #f8fbff;
+    }
+
+    .summary-label {
+      display: block;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .summary-number {
+      display: block;
+      margin-top: 7px;
+      font-size: 25px;
+      font-weight: bold;
+      color: #145da0;
+    }
+
+    .student-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .student-card {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #dbe5f0;
+      border-radius: 10px;
+      background: #fff;
       text-align: left;
       cursor: pointer;
     }
-    .student-card:hover { border-color: #1769c2; background: #f8fbff; }
+
+    .student-card:hover {
+      border-color: #1769c2;
+      background: #f8fbff;
+    }
+
     .student-name {
       display: block;
       color: #145da0;
-      font-weight: bold;
       font-size: 17px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
     }
+
     .detail {
       display: block;
-      margin-top: 5px;
+      margin-top: 6px;
       color: #64748b;
       font-size: 13px;
       overflow-wrap: anywhere;
     }
-    .hidden { display: none !important; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td {
+
+    .presence-badge {
+      display: inline-block;
+      margin-top: 9px;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .online {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .offline {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .unknown {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
       padding: 11px;
       border-bottom: 1px solid #e5eaf1;
       text-align: left;
     }
-    th { background: #f2f6fc; }
-    .empty { padding: 16px; color: #64748b; text-align: center; }
-    .error { color: #b91c1c; }
-    @media(max-width:600px) {
-      body { padding: 9px; }
-      main { padding: 14px; }
-      h1 { font-size: 21px; }
-      th, td { padding: 8px; font-size: 13px; }
+
+    th {
+      background: #f2f6fc;
+    }
+
+    .empty {
+      padding: 16px;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 9px;
+      }
+
+      main {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        font-size: 13px;
+      }
     }
   </style>
 </head>
@@ -90,14 +225,45 @@
 <body>
 <main>
   <h1>Student Login History</h1>
-  <p class="muted">Administrator: select a student to view recent login records.</p>
+
+  <p class="muted">
+    Administrator panel: view student presence and recent login history.
+  </p>
 
   <div class="toolbar">
-    <a class="button secondary" href="./index.html">Back to website</a>
-    <button id="refreshButton" type="button">Refresh</button>
+    <a class="button secondary" href="./index.html">
+      Back to website
+    </a>
+
+    <button id="refreshButton" type="button">
+      Refresh
+    </button>
   </div>
 
-  <p id="statusMessage" class="message">Connecting to Firebase…</p>
+  <p id="statusMessage" class="message">
+    Connecting to Firebase…
+  </p>
+
+  <p id="presenceMessage" class="message">
+    Waiting for live presence data…
+  </p>
+
+  <div class="summary">
+    <div class="summary-card">
+      <span class="summary-label">Total students</span>
+      <span id="totalCount" class="summary-number">—</span>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">Online now</span>
+      <span id="onlineCount" class="summary-number">—</span>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">Offline</span>
+      <span id="offlineCount" class="summary-number">—</span>
+    </div>
+  </div>
 
   <section id="studentsSection" class="hidden">
     <h2>Students</h2>
@@ -106,285 +272,9 @@
 
   <section id="historySection" class="hidden">
     <div class="toolbar">
-      <button id="backButton" class="secondary" type="button">← Back to students</button>
+      <button id="backButton" class="secondary" type="button">
+        ← Back to students
+      </button>
     </div>
-    <h2 id="historyTitle">Login history</h2>
-    <p id="historyInfo" class="muted"></p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Login date and time</th>
-            <th>User UID</th>
-          </tr>
-        </thead>
-        <tbody id="historyBody"></tbody>
-      </table>
-    </div>
-    <p id="historyStatus" class="message"></p>
-  </section>
-</main>
 
-<script type="module">
-  import { initializeApp } from
-    "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-
-  import { getAuth, onAuthStateChanged } from
-    "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-
-  import {
-    getFirestore,
-    collection,
-    getDocs,
-    query,
-    orderBy
-  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-  // IMPORTANT: Paste your actual Firebase Web app apiKey here.
-  const firebaseConfig = {
-    apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
-    authDomain: "niru-study-portal.firebaseapp.com",
-    projectId: "niru-study-portal",
-    storageBucket: "niru-study-portal.firebasestorage.app",
-    messagingSenderId: "476816671743",
-    appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
-  };
-
-  // Your administrator Firebase Authentication UID.
-  const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
-
-  const $ = id => document.getElementById(id);
-
-  let students = [];
-  let logins = [];
-
-  function status(message, isError = false) {
-    const element = $("statusMessage");
-    element.textContent = message;
-    element.classList.toggle("error", isError);
-  }
-
-  function loginTime(value) {
-    if (value?.toDate) return value.toDate().toLocaleString();
-    return "Time unavailable";
-  }
-
-  function makeCellRow(first, second) {
-    const row = document.createElement("tr");
-    const firstCell = document.createElement("td");
-    const secondCell = document.createElement("td");
-
-    firstCell.textContent = first;
-    secondCell.textContent = second;
-    row.append(firstCell, secondCell);
-
-    return row;
-  }
-
-  function renderStudents() {
-    const list = $("studentsList");
-    list.replaceChildren();
-
-    if (!students.length) {
-      const empty = document.createElement("p");
-      empty.className = "empty";
-      empty.textContent = "No student profiles found in the Firestore 'users' collection.";
-      list.append(empty);
-      return;
-    }
-
-    students
-      .slice()
-      .sort((a, b) =>
-        String(a.name || a.email || "")
-          .localeCompare(String(b.name || b.email || ""))
-      )
-      .forEach(student => {
-        const studentLogins = logins.filter(
-          record => record.userId === student.uid
-        );
-
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "student-card";
-
-        const name = document.createElement("span");
-        name.className = "student-name";
-        name.textContent = student.name || "Student";
-
-        const email = document.createElement("span");
-        email.className = "detail";
-        email.textContent = student.email || "";
-
-        const lastLogin = document.createElement("span");
-        lastLogin.className = "detail";
-        lastLogin.textContent = studentLogins.length
-          ? "Last login: " + loginTime(studentLogins[0].loginAt)
-          : "No login history found";
-
-        card.append(name, email, lastLogin);
-        card.addEventListener("click", () => openHistory(student));
-        list.append(card);
-      });
-  }
-
-  function openHistory(student) {
-    $("studentsSection").classList.add("hidden");
-    $("historySection").classList.remove("hidden");
-
-    $("historyTitle").textContent =
-      "Login history: " + (student.name || student.email || "Student");
-
-    $("historyInfo").textContent = student.email || "";
-
-    const body = $("historyBody");
-    body.replaceChildren();
-
-    const records = logins
-      .filter(record => record.userId === student.uid)
-      .slice(0, 15);
-
-    if (!records.length) {
-      const row = document.createElement("tr");
-      const cell = document.createElement("td");
-
-      cell.colSpan = 2;
-      cell.className = "empty";
-      cell.textContent = "No login records found for this account.";
-
-      row.append(cell);
-      body.append(row);
-    } else {
-      records.forEach(record => {
-        body.append(
-          makeCellRow(
-            loginTime(record.loginAt),
-            record.userId || "Unavailable"
-          )
-        );
-      });
-    }
-
-    $("historyStatus").textContent =
-      `Showing ${records.length} record(s).`;
-  }
-
-  async function loadData() {
-    $("refreshButton").disabled = true;
-    status("Admin verified. Loading student profiles…");
-
-    try {
-      // First Firestore read: users
-      let usersSnap;
-
-      try {
-        usersSnap = await getDocs(collection(db, "users"));
-      } catch (error) {
-        console.error("READ FAILED: Firestore users collection", error);
-        throw new Error(
-          `Could not read 'users' (${error.code || error.message}). Check admin UID and Firestore rules.`
-        );
-      }
-
-      students = usersSnap.docs.map(document => ({
-        uid: document.id,
-        ...document.data()
-      }));
-
-      status("Student profiles loaded. Loading login records…");
-
-      // Second Firestore read: loginHistory
-      let loginSnap;
-
-      try {
-        const loginQuery = query(
-          collection(db, "loginHistory"),
-          orderBy("loginAt", "desc")
-        );
-
-        loginSnap = await getDocs(loginQuery);
-      } catch (error) {
-        console.error("READ FAILED: Firestore loginHistory collection", error);
-        throw new Error(
-          `Could not read 'loginHistory' (${error.code || error.message}). Check admin UID and Firestore rules.`
-        );
-      }
-
-      logins = loginSnap.docs.map(document => ({
-        id: document.id,
-        ...document.data()
-      }));
-
-      renderStudents();
-
-      $("studentsSection").classList.remove("hidden");
-      $("historySection").classList.add("hidden");
-
-      status(
-        `Loaded ${students.length} student profile(s) and ${logins.length} login record(s).`
-      );
-
-    } catch (error) {
-      console.error("Login history page error:", error);
-      status(error.message || "Unable to load Firestore data.", true);
-    } finally {
-      $("refreshButton").disabled = false;
-    }
-  }
-
-  $("refreshButton").addEventListener("click", loadData);
-
-  $("backButton").addEventListener("click", () => {
-    $("historySection").classList.add("hidden");
-    $("studentsSection").classList.remove("hidden");
-  });
-
-  let app;
-  let auth;
-  let db;
-
-  try {
-    if (
-      !firebaseConfig.apiKey ||
-      firebaseConfig.apiKey === "REPLACE_WITH_REAL_FIREBASE_WEB_API_KEY"
-    ) {
-      throw new Error(
-        "Firebase apiKey is still a placeholder. Add your real Web app apiKey in this HTML."
-      );
-    }
-
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-
-    onAuthStateChanged(auth, async user => {
-      if (!user) {
-        status(
-          "You are signed out. Sign in to the website with the administrator account, then open this page."
-        );
-        $("studentsSection").classList.add("hidden");
-        $("historySection").classList.add("hidden");
-        return;
-      }
-
-      console.log("Signed-in Firebase UID:", user.uid);
-
-      if (user.uid !== ADMIN_UID) {
-        status(
-          `Wrong account: signed-in UID is ${user.uid}. This page requires the administrator UID.`
-        );
-        $("studentsSection").classList.add("hidden");
-        $("historySection").classList.add("hidden");
-        return;
-      }
-
-      await loadData();
-    });
-
-  } catch (error) {
-    console.error("Firebase initialization error:", error);
-    status(error.message || "Firebase could not initialize.", true);
-  }
-</script>
-</body>
-</html>
+    <h2 id="historyTitle">Login history
