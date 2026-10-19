@@ -6,9 +6,7 @@
   <title>Student Login History | Niru Study Notes</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -27,17 +25,10 @@
       box-shadow: 0 5px 22px #00000012;
     }
 
-    h1 {
-      color: #145da0;
-      font-size: 25px;
-    }
+    h1 { color: #145da0; font-size: 25px; }
+    h2 { font-size: 20px; }
 
-    h2 {
-      font-size: 20px;
-    }
-
-    .muted,
-    .message {
+    .muted, .message {
       color: #64748b;
       font-size: 14px;
       overflow-wrap: anywhere;
@@ -50,27 +41,19 @@
       margin: 16px 0;
     }
 
-    button,
-    .button {
+    button, .button {
       border: 0;
       border-radius: 7px;
       padding: 10px 14px;
       background: #1769c2;
-      color: #fff;
+      color: white;
       font-size: 14px;
       cursor: pointer;
       text-decoration: none;
     }
 
-    .secondary {
-      background: #e8f1fb;
-      color: #145da0;
-    }
-
-    button:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
+    .secondary { background: #e8f1fb; color: #145da0; }
+    button:disabled { opacity: .6; cursor: wait; }
 
     .summary {
       display: grid;
@@ -86,24 +69,10 @@
       background: #f8fbff;
     }
 
-    .summary-label {
-      display: block;
-      color: #64748b;
-      font-size: 13px;
-    }
+    .summary-label { display: block; color: #64748b; font-size: 13px; }
+    .summary-number { display: block; margin-top: 7px; font-size: 25px; font-weight: bold; color: #145da0; }
 
-    .summary-number {
-      display: block;
-      margin-top: 7px;
-      font-size: 25px;
-      font-weight: bold;
-      color: #145da0;
-    }
-
-    .student-list {
-      display: grid;
-      gap: 10px;
-    }
+    .student-list { display: grid; gap: 10px; }
 
     .student-card {
       display: block;
@@ -111,31 +80,14 @@
       padding: 15px;
       border: 1px solid #dbe5f0;
       border-radius: 10px;
-      background: #fff;
+      background: white;
       text-align: left;
       cursor: pointer;
     }
 
-    .student-card:hover {
-      border-color: #1769c2;
-      background: #f8fbff;
-    }
-
-    .student-name {
-      display: block;
-      color: #145da0;
-      font-size: 17px;
-      font-weight: bold;
-      overflow-wrap: anywhere;
-    }
-
-    .detail {
-      display: block;
-      margin-top: 6px;
-      color: #64748b;
-      font-size: 13px;
-      overflow-wrap: anywhere;
-    }
+    .student-card:hover { border-color: #1769c2; background: #f8fbff; }
+    .student-name { display: block; color: #145da0; font-size: 17px; font-weight: bold; overflow-wrap: anywhere; }
+    .detail { display: block; margin-top: 6px; color: #64748b; font-size: 13px; overflow-wrap: anywhere; }
 
     .presence-badge {
       display: inline-block;
@@ -146,78 +98,25 @@
       font-weight: bold;
     }
 
-    .online {
-      background: #dcfce7;
-      color: #166534;
-    }
+    .online { background: #dcfce7; color: #166534; }
+    .offline { background: #e5e7eb; color: #374151; }
+    .unknown { background: #fef3c7; color: #92400e; }
 
-    .offline {
-      background: #e5e7eb;
-      color: #374151;
-    }
+    .hidden { display: none !important; }
+    .table-wrap { overflow-x: auto; }
 
-    .unknown {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th,
-    td {
-      padding: 11px;
-      border-bottom: 1px solid #e5eaf1;
-      text-align: left;
-    }
-
-    th {
-      background: #f2f6fc;
-    }
-
-    .empty {
-      padding: 16px;
-      color: #64748b;
-      text-align: center;
-    }
-
-    .error {
-      color: #b91c1c;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 11px; border-bottom: 1px solid #e5eaf1; text-align: left; }
+    th { background: #f2f6fc; }
+    .empty { padding: 16px; color: #64748b; text-align: center; }
+    .error { color: #b91c1c; white-space: pre-wrap; overflow-wrap: anywhere; }
 
     @media (max-width: 600px) {
-      body {
-        padding: 9px;
-      }
-
-      main {
-        padding: 14px;
-      }
-
-      h1 {
-        font-size: 21px;
-      }
-
-      .summary {
-        grid-template-columns: 1fr;
-      }
-
-      th,
-      td {
-        padding: 8px;
-        font-size: 13px;
-      }
+      body { padding: 9px; }
+      main { padding: 14px; }
+      h1 { font-size: 21px; }
+      .summary { grid-template-columns: 1fr; }
+      th, td { padding: 8px; font-size: 13px; }
     }
   </style>
 </head>
@@ -225,40 +124,25 @@
 <body>
 <main>
   <h1>Student Login History</h1>
-
-  <p class="muted">
-    Administrator panel: view student presence and recent login history.
-  </p>
+  <p class="muted">Administrator panel: view student presence and login history.</p>
 
   <div class="toolbar">
-    <a class="button secondary" href="./index.html">
-      Back to website
-    </a>
-
-    <button id="refreshButton" type="button">
-      Refresh
-    </button>
+    <a class="button secondary" href="./index.html">Back to website</a>
+    <button id="refreshButton" type="button">Refresh</button>
   </div>
 
-  <p id="statusMessage" class="message">
-    Connecting to Firebase…
-  </p>
-
-  <p id="presenceMessage" class="message">
-    Waiting for live presence data…
-  </p>
+  <p id="statusMessage" class="message">Checking administrator access…</p>
+  <p id="presenceMessage" class="message">Waiting for presence data…</p>
 
   <div class="summary">
     <div class="summary-card">
       <span class="summary-label">Total students</span>
       <span id="totalCount" class="summary-number">—</span>
     </div>
-
     <div class="summary-card">
       <span class="summary-label">Online now</span>
       <span id="onlineCount" class="summary-number">—</span>
     </div>
-
     <div class="summary-card">
       <span class="summary-label">Offline</span>
       <span id="offlineCount" class="summary-number">—</span>
@@ -272,40 +156,279 @@
 
   <section id="historySection" class="hidden">
     <div class="toolbar">
-      <button id="backButton" class="secondary" type="button">
-        ← Back to students
-      </button>
+      <button id="backButton" class="secondary" type="button">← Back to students</button>
     </div>
 
-    <h2 id="historyTitle">Login history
-              <h2 id="historyTitle">Login History</h2>
-        <p id="historyMessage">Select a student to view their login history.</p>
+    <h2 id="historyTitle">Login history</h2>
+    <p id="historyMessage" class="message"></p>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Login date and time</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody">
-              <tr>
-                <td colspan="2">No login history selected.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Login date and time</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="2" class="empty">Select a student.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
 
-        <button id="backToStudentsBtn" type="button">
-          Back to students
-        </button>
-      </section>
-    </main>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  import {
+    getDatabase,
+    ref,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
-    <script type="module">
-      // This is the end of the HTML layout.
-      // The Firebase JavaScript code must go here.
-    </script>
-  </body>
+  const firebaseConfig = {
+    apiKey: "PASTE_YOUR_REAL_WEB_API_KEY",
+    authDomain: "niru-study-portal.firebaseapp.com",
+    projectId: "niru-study-portal",
+    databaseURL: "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
+    messagingSenderId: "476816671743",
+    appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
+  };
+
+  const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
+
+  const statusMessage = document.getElementById("statusMessage");
+  const presenceMessage = document.getElementById("presenceMessage");
+  const studentsSection = document.getElementById("studentsSection");
+  const historySection = document.getElementById("historySection");
+  const studentsList = document.getElementById("studentsList");
+  const historyTitle = document.getElementById("historyTitle");
+  const historyMessage = document.getElementById("historyMessage");
+  const historyTableBody = document.getElementById("historyTableBody");
+
+  let app, auth, db, rtdb;
+  let students = [];
+  let loginRecords = [];
+  let presenceRecords = {};
+  let selectedStudent = null;
+  let presenceListenerStarted = false;
+
+  function showError(message) {
+    statusMessage.className = "message error";
+    statusMessage.textContent = message;
+  }
+
+  function timestampToDate(value) {
+    if (value && typeof value.toDate === "function") return value.toDate();
+    if (typeof value === "number") return new Date(value);
+    if (value && typeof value.seconds === "number") {
+      return new Date(value.seconds * 1000);
+    }
+    return null;
+  }
+
+  function formatDate(value) {
+    const date = timestampToDate(value);
+    return date && !Number.isNaN(date.getTime())
+      ? date.toLocaleString()
+      : "Date unavailable";
+  }
+
+  function getStudentName(student) {
+    return student.name || student.fullName || student.displayName || student.email || "Unnamed student";
+  }
+
+  function getPresence(uid) {
+    const record = presenceRecords[uid];
+    if (!record || !record.state) return "unknown";
+    return record.state === "online" ? "online" : "offline";
+  }
+
+  function updateCounts() {
+    const online = students.filter(student => getPresence(student.id) === "online").length;
+    const offline = students.filter(student => getPresence(student.id) === "offline").length;
+
+    document.getElementById("totalCount").textContent = students.length;
+    document.getElementById("onlineCount").textContent = online;
+    document.getElementById("offlineCount").textContent = offline;
+  }
+
+  function renderStudents() {
+    studentsList.replaceChildren();
+
+    if (!students.length) {
+      studentsList.innerHTML = '<p class="empty">No student documents found in Firestore users.</p>';
+      return;
+    }
+
+    for (const student of students) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "student-card";
+
+      const name = document.createElement("span");
+      name.className = "student-name";
+      name.textContent = getStudentName(student);
+
+      const detail = document.createElement("span");
+      detail.className = "detail";
+      detail.textContent = student.email || `User ID: ${student.id}`;
+
+      const badge = document.createElement("span");
+      const state = getPresence(student.id);
+      badge.className = `presence-badge ${state}`;
+      badge.textContent = state === "online" ? "Online" : state === "offline" ? "Offline" : "Presence unknown";
+
+      button.append(name, detail, badge);
+      button.addEventListener("click", () => showStudentHistory(student));
+      studentsList.append(button);
+    }
+
+    updateCounts();
+  }
+
+  function showStudentHistory(student) {
+    selectedStudent = student;
+    studentsSection.classList.add("hidden");
+    historySection.classList.remove("hidden");
+
+    historyTitle.textContent = `Login history: ${getStudentName(student)}`;
+    historyMessage.textContent = student.email || `Student UID: ${student.id}`;
+
+    const records = loginRecords
+      .filter(record => record.userId === student.id)
+      .sort((a, b) => {
+        const dateA = timestampToDate(a.loginAt)?.getTime() || 0;
+        const dateB = timestampToDate(b.loginAt)?.getTime() || 0;
+        return dateB - dateA;
+      });
+
+    historyTableBody.replaceChildren();
+
+    if (!records.length) {
+      historyTableBody.innerHTML = '<tr><td colspan="2" class="empty">No login-history documents found for this student.</td></tr>';
+      return;
+    }
+
+    for (const record of records) {
+      const row = document.createElement("tr");
+      const emailCell = document.createElement("td");
+      const dateCell = document.createElement("td");
+
+      emailCell.textContent = student.email || "Email unavailable";
+      dateCell.textContent = formatDate(record.loginAt);
+
+      row.append(emailCell, dateCell);
+      historyTableBody.append(row);
+    }
+  }
+
+  function showStudents() {
+    selectedStudent = null;
+    historySection.classList.add("hidden");
+    studentsSection.classList.remove("hidden");
+  }
+
+  async function loadFirestoreData() {
+    statusMessage.textContent = "Loading student and login-history records…";
+
+    // Read student profiles.
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    students = usersSnapshot.docs.map(documentSnapshot => ({
+      id: documentSnapshot.id,
+      ...documentSnapshot.data()
+    }));
+
+    // Read login events.
+    const historySnapshot = await getDocs(collection(db, "loginHistory"));
+    loginRecords = historySnapshot.docs.map(documentSnapshot => ({
+      id: documentSnapshot.id,
+      ...documentSnapshot.data()
+    }));
+
+    renderStudents();
+    statusMessage.className = "message";
+    statusMessage.textContent = `Loaded ${students.length} student records and ${loginRecords.length} login-history records.`;
+  }
+
+  function startPresenceListener() {
+    if (presenceListenerStarted) return;
+    presenceListenerStarted = true;
+
+    const presenceRef = ref(rtdb, "presence");
+
+    onValue(
+      presenceRef,
+      snapshot => {
+        presenceRecords = snapshot.val() || {};
+        presenceMessage.textContent = "Live presence data updated.";
+        renderStudents();
+      },
+      error => {
+        presenceMessage.className = "message error";
+        presenceMessage.textContent = `Could not read Realtime Database presence: ${error.message}`;
+      }
+    );
+  }
+
+  document.getElementById("backButton").addEventListener("click", showStudents);
+
+  document.getElementById("refreshButton").addEventListener("click", async () => {
+    const button = document.getElementById("refreshButton");
+    button.disabled = true;
+
+    try {
+      await loadFirestoreData();
+      if (selectedStudent) showStudentHistory(selectedStudent);
+    } catch (error) {
+      showError(`Refresh failed: ${error.code || ""} ${error.message}`);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    rtdb = getDatabase(app);
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        showError("You are not signed in. Sign in to the website with the administrator account, then reopen this page.");
+        studentsSection.classList.add("hidden");
+        historySection.classList.add("hidden");
+        return;
+      }
+
+      if (user.uid !== ADMIN_UID) {
+        showError(`Administrator access denied. Signed-in UID: ${user.uid}`);
+        studentsSection.classList.add("hidden");
+        historySection.classList.add("hidden");
+        return;
+      }
+
+      try {
+        await loadFirestoreData();
+        startPresenceListener();
+      } catch (error) {
+        showError(
+          `Firebase could not load records.\nError code: ${error.code || "unknown"}\nDetails: ${error.message}\n\nCheck the Web API key, Firebase project, collection names, and published Firestore/Realtime Database rules.`
+        );
+      }
+    });
+  } catch (error) {
+    showError(`Firebase initialization failed: ${error.message}`);
+  }
+</script>
+</body>
 </html>
