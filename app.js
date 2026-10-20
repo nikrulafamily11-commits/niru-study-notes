@@ -268,7 +268,7 @@ if ($("login")) {
         $("login").reset();
 
         message(
-          "Signed in successfully. Login time recorded.",
+          "Signed in successfully.",
           "success"
         );
       } catch (historyError) {
