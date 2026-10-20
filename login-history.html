@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +56,7 @@
     .secondary { background: #e8f1fb; color: #145da0; }
     button:disabled { opacity: .6; cursor: wait; }
 
+    /* Three clickable summary cards */
     .summary {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -63,14 +65,52 @@
     }
 
     .summary-card {
+      display: block;
+      width: 100%;
       padding: 16px;
       border: 1px solid #dbe5f0;
       border-radius: 10px;
       background: #f8fbff;
+      color: #1f2937;
+      text-align: left;
+      cursor: pointer;
     }
 
-    .summary-label { display: block; color: #64748b; font-size: 13px; }
-    .summary-number { display: block; margin-top: 7px; font-size: 25px; font-weight: bold; color: #145da0; }
+    .summary-card:hover {
+      border-color: #1769c2;
+      background: #edf6ff;
+    }
+
+    .summary-card:focus-visible {
+      outline: 3px solid #93c5fd;
+      outline-offset: 2px;
+    }
+
+    .summary-card.active {
+      border: 2px solid #1769c2;
+      background: #edf6ff;
+    }
+
+    .summary-label {
+      display: block;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .summary-number {
+      display: block;
+      margin-top: 7px;
+      font-size: 25px;
+      font-weight: bold;
+      color: #145da0;
+    }
+
+    .summary-hint {
+      display: block;
+      margin-top: 7px;
+      color: #64748b;
+      font-size: 12px;
+    }
 
     .student-list { display: grid; gap: 10px; }
 
@@ -85,9 +125,26 @@
       cursor: pointer;
     }
 
-    .student-card:hover { border-color: #1769c2; background: #f8fbff; }
-    .student-name { display: block; color: #145da0; font-size: 17px; font-weight: bold; overflow-wrap: anywhere; }
-    .detail { display: block; margin-top: 6px; color: #64748b; font-size: 13px; overflow-wrap: anywhere; }
+    .student-card:hover {
+      border-color: #1769c2;
+      background: #f8fbff;
+    }
+
+    .student-name {
+      display: block;
+      color: #145da0;
+      font-size: 17px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .detail {
+      display: block;
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
 
     .presence-badge {
       display: inline-block;
@@ -105,8 +162,19 @@
     .hidden { display: none !important; }
     .table-wrap { overflow-x: auto; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 11px; border-bottom: 1px solid #e5eaf1; text-align: left; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      min-width: 350px;
+    }
+
+    th, td {
+      padding: 11px;
+      border-bottom: 1px solid #e5eaf1;
+      text-align: left;
+    }
+
     th { background: #f2f6fc; }
     .empty { padding: 16px; color: #64748b; text-align: center; }
     .error { color: #b91c1c; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -124,39 +192,68 @@
 <body>
 <main>
   <h1>Student Login History</h1>
-  <p class="muted">Administrator panel: view student presence and login history.</p>
+  <p class="muted">
+    Administrator panel: view student presence and login history.
+  </p>
 
   <div class="toolbar">
     <a class="button secondary" href="./index.html">Back to website</a>
     <button id="refreshButton" type="button">Refresh</button>
   </div>
 
-  <p id="statusMessage" class="message">Checking administrator access…</p>
-  <p id="presenceMessage" class="message">Waiting for presence data…</p>
+  <p id="statusMessage" class="message">
+    Checking administrator access…
+  </p>
 
+  <p id="presenceMessage" class="message">
+    Waiting for presence data…
+  </p>
+
+  <!-- Clickable summary cards -->
   <div class="summary">
-    <div class="summary-card">
+
+    <button id="totalCard" class="summary-card" type="button">
       <span class="summary-label">Total students</span>
       <span id="totalCount" class="summary-number">—</span>
-    </div>
-    <div class="summary-card">
+      <span class="summary-hint">Click to see all students</span>
+    </button>
+
+    <button id="onlineCard" class="summary-card" type="button">
       <span class="summary-label">Online now</span>
       <span id="onlineCount" class="summary-number">—</span>
-    </div>
-    <div class="summary-card">
+      <span class="summary-hint">Click to see online students</span>
+    </button>
+
+    <button id="offlineCard" class="summary-card" type="button">
       <span class="summary-label">Offline</span>
       <span id="offlineCount" class="summary-number">—</span>
-    </div>
+      <span class="summary-hint">Click to see offline students</span>
+    </button>
+
   </div>
 
+  <!-- Filtered student list -->
   <section id="studentsSection" class="hidden">
-    <h2>Students</h2>
+    <div class="toolbar">
+      <button id="listBackButton" class="secondary" type="button">
+        ← Hide student list
+      </button>
+    </div>
+
+    <h2 id="studentsHeading">All students</h2>
+    <p id="studentsMessage" class="muted">
+      Click a student to view their recent login history.
+    </p>
+
     <div id="studentsList" class="student-list"></div>
   </section>
 
+  <!-- Individual student history -->
   <section id="historySection" class="hidden">
     <div class="toolbar">
-      <button id="backButton" class="secondary" type="button">← Back to students</button>
+      <button id="backButton" class="secondary" type="button">
+        ← Back to students
+      </button>
     </div>
 
     <h2 id="historyTitle">Login history</h2>
@@ -166,12 +263,15 @@
       <table>
         <thead>
           <tr>
-            <th>Email</th>
+            <th>#</th>
+            <th>Student email</th>
             <th>Login date and time</th>
           </tr>
         </thead>
         <tbody id="historyTableBody">
-          <tr><td colspan="2" class="empty">Select a student.</td></tr>
+          <tr>
+            <td colspan="3" class="empty">Select a student.</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -179,99 +279,243 @@
 </main>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
   import {
     getAuth,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
   import {
     getFirestore,
     collection,
     getDocs
   } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
   import {
     getDatabase,
     ref,
     onValue
   } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
+
+  // Your existing Firebase project configuration
   const firebaseConfig = {
     apiKey: "AIzaSyDaMLePSVJvJetQsSvDDgp7XiczIfHSBQU",
     authDomain: "niru-study-portal.firebaseapp.com",
     projectId: "niru-study-portal",
-    databaseURL: "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
+    databaseURL:
+      "https://niru-study-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
     messagingSenderId: "476816671743",
     appId: "1:476816671743:web:f35d9f5a9e5bcb7c121dca"
   };
 
   const ADMIN_UID = "SxD4BLFzpiVkI53GE8brNioNfKx2";
 
-  const statusMessage = document.getElementById("statusMessage");
-  const presenceMessage = document.getElementById("presenceMessage");
-  const studentsSection = document.getElementById("studentsSection");
-  const historySection = document.getElementById("historySection");
-  const studentsList = document.getElementById("studentsList");
-  const historyTitle = document.getElementById("historyTitle");
-  const historyMessage = document.getElementById("historyMessage");
-  const historyTableBody = document.getElementById("historyTableBody");
+  const $ = id => document.getElementById(id);
 
   let app, auth, db, rtdb;
+
   let students = [];
   let loginRecords = [];
   let presenceRecords = {};
+
+  let presenceReady = false;
+  let presenceError = false;
+
   let selectedStudent = null;
-  let presenceListenerStarted = false;
+
+  // Which list the administrator is currently viewing
+  let activeFilter = "all";
+
+  const studentsSection = $("studentsSection");
+  const historySection = $("historySection");
+  const studentsList = $("studentsList");
+  const historyTitle = $("historyTitle");
+  const historyMessage = $("historyMessage");
+  const historyTableBody = $("historyTableBody");
+
 
   function showError(message) {
-    statusMessage.className = "message error";
-    statusMessage.textContent = message;
+    $("statusMessage").className = "message error";
+    $("statusMessage").textContent = message;
   }
 
+
+  // Convert Firestore timestamps, milliseconds, or timestamp objects
+  // into JavaScript Date objects.
   function timestampToDate(value) {
-    if (value && typeof value.toDate === "function") return value.toDate();
-    if (typeof value === "number") return new Date(value);
+    if (value && typeof value.toDate === "function") {
+      return value.toDate();
+    }
+
+    if (typeof value === "number") {
+      return new Date(value);
+    }
+
     if (value && typeof value.seconds === "number") {
       return new Date(value.seconds * 1000);
     }
+
+    if (typeof value === "string") {
+      const parsed = new Date(value);
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+
     return null;
   }
 
+
+  function timestampToMillis(value) {
+    const date = timestampToDate(value);
+    return date && !Number.isNaN(date.getTime())
+      ? date.getTime()
+      : 0;
+  }
+
+
   function formatDate(value) {
     const date = timestampToDate(value);
+
     return date && !Number.isNaN(date.getTime())
       ? date.toLocaleString()
       : "Date unavailable";
   }
 
+
   function getStudentName(student) {
-    return student.name || student.fullName || student.displayName || student.email || "Unnamed student";
+    return student.name ||
+      student.fullName ||
+      student.displayName ||
+      student.email ||
+      "Unnamed student";
   }
 
+
+  // RTDB presence is expected at presence/{studentUID}
+  // with a state field containing "online" or "offline".
   function getPresence(uid) {
+    if (!presenceReady || presenceError) {
+      return "unknown";
+    }
+
     const record = presenceRecords[uid];
-    if (!record || !record.state) return "unknown";
-    return record.state === "online" ? "online" : "offline";
+
+    // No active presence record means the student is not currently
+    // reporting an online connection.
+    if (!record) {
+      return "offline";
+    }
+
+    if (record.state === "online") {
+      return "online";
+    }
+
+    if (record.state === "offline") {
+      return "offline";
+    }
+
+    return "unknown";
   }
+
 
   function updateCounts() {
-    const online = students.filter(student => getPresence(student.id) === "online").length;
-    const offline = students.filter(student => getPresence(student.id) === "offline").length;
+    const online = students.filter(
+      student => getPresence(student.id) === "online"
+    ).length;
 
-    document.getElementById("totalCount").textContent = students.length;
-    document.getElementById("onlineCount").textContent = online;
-    document.getElementById("offlineCount").textContent = offline;
+    const offline = students.filter(
+      student => getPresence(student.id) === "offline"
+    ).length;
+
+    $("totalCount").textContent = students.length;
+
+    // Until the presence listener has connected, avoid presenting
+    // guessed online/offline counts.
+    $("onlineCount").textContent =
+      presenceReady && !presenceError ? online : "—";
+
+    $("offlineCount").textContent =
+      presenceReady && !presenceError ? offline : "—";
   }
 
+
+  function getFilteredStudents() {
+    if (activeFilter === "online") {
+      return students.filter(
+        student => getPresence(student.id) === "online"
+      );
+    }
+
+    if (activeFilter === "offline") {
+      return students.filter(
+        student => getPresence(student.id) === "offline"
+      );
+    }
+
+    return students;
+  }
+
+
+  function setActiveCard() {
+    $("totalCard").classList.toggle(
+      "active",
+      activeFilter === "all"
+    );
+
+    $("onlineCard").classList.toggle(
+      "active",
+      activeFilter === "online"
+    );
+
+    $("offlineCard").classList.toggle(
+      "active",
+      activeFilter === "offline"
+    );
+  }
+
+
   function renderStudents() {
+    updateCounts();
+    setActiveCard();
+
     studentsList.replaceChildren();
 
-    if (!students.length) {
-      studentsList.innerHTML = '<p class="empty">No student documents found in Firestore users.</p>';
+    const filteredStudents = getFilteredStudents();
+
+    if (activeFilter === "all") {
+      $("studentsHeading").textContent = "All students";
+    } else if (activeFilter === "online") {
+      $("studentsHeading").textContent = "Students online now";
+    } else {
+      $("studentsHeading").textContent = "Offline students";
+    }
+
+    $("studentsMessage").textContent =
+      `Showing ${filteredStudents.length} student(s). ` +
+      "Select a student to see their latest 20 login records.";
+
+    if (!filteredStudents.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty";
+
+      if (activeFilter === "online") {
+        empty.textContent =
+          "No students are currently reporting as online.";
+      } else if (activeFilter === "offline") {
+        empty.textContent = "No offline students found.";
+      } else {
+        empty.textContent = "No student documents found in Firestore.";
+      }
+
+      studentsList.append(empty);
       return;
     }
 
-    for (const student of students) {
+    for (const student of filteredStudents) {
       const button = document.createElement("button");
+
       button.type = "button";
       button.className = "student-card";
 
@@ -281,121 +525,233 @@
 
       const detail = document.createElement("span");
       detail.className = "detail";
-      detail.textContent = student.email || `User ID: ${student.id}`;
+      detail.textContent =
+        student.email || `User ID: ${student.id}`;
 
       const badge = document.createElement("span");
       const state = getPresence(student.id);
+
       badge.className = `presence-badge ${state}`;
-      badge.textContent = state === "online" ? "Online" : state === "offline" ? "Offline" : "Presence unknown";
+
+      badge.textContent =
+        state === "online"
+          ? "● Online now"
+          : state === "offline"
+            ? "○ Offline"
+            : "Presence unknown";
 
       button.append(name, detail, badge);
-      button.addEventListener("click", () => showStudentHistory(student));
+
+      button.addEventListener("click", () => {
+        showStudentHistory(student);
+      });
+
       studentsList.append(button);
     }
-
-    updateCounts();
   }
 
+
+  // Show the list associated with whichever summary card was clicked.
+  function showStudentList(filter) {
+    activeFilter = filter;
+    selectedStudent = null;
+
+    historySection.classList.add("hidden");
+    studentsSection.classList.remove("hidden");
+
+    renderStudents();
+  }
+
+
+  // Open one student's latest 20 login records.
   function showStudentHistory(student) {
     selectedStudent = student;
+
     studentsSection.classList.add("hidden");
     historySection.classList.remove("hidden");
 
-    historyTitle.textContent = `Login history: ${getStudentName(student)}`;
-    historyMessage.textContent = student.email || `Student UID: ${student.id}`;
+    historyTitle.textContent =
+      `Login history: ${getStudentName(student)}`;
+
+    historyMessage.textContent =
+      `${student.email || student.id} — newest logins first`;
+
+    historyTableBody.replaceChildren();
 
     const records = loginRecords
       .filter(record => record.userId === student.id)
       .sort((a, b) => {
-        const dateA = timestampToDate(a.loginAt)?.getTime() || 0;
-        const dateB = timestampToDate(b.loginAt)?.getTime() || 0;
-        return dateB - dateA;
-      });
-
-    historyTableBody.replaceChildren();
+        return timestampToMillis(b.loginAt) -
+               timestampToMillis(a.loginAt);
+      })
+      .slice(0, 20);
 
     if (!records.length) {
-      historyTableBody.innerHTML = '<tr><td colspan="2" class="empty">No login-history documents found for this student.</td></tr>';
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+
+      cell.colSpan = 3;
+      cell.className = "empty";
+      cell.textContent =
+        "No login-history documents found for this student.";
+
+      row.append(cell);
+      historyTableBody.append(row);
+
+      historyMessage.textContent =
+        `${student.email || student.id} — no recorded logins`;
+
       return;
     }
 
-    for (const record of records) {
+    records.forEach((record, index) => {
       const row = document.createElement("tr");
-      const emailCell = document.createElement("td");
-      const dateCell = document.createElement("td");
 
-      emailCell.textContent = student.email || "Email unavailable";
+      const numberCell = document.createElement("td");
+      numberCell.textContent = String(index + 1);
+
+      const emailCell = document.createElement("td");
+      emailCell.textContent =
+        record.email || student.email || "Email unavailable";
+
+      const dateCell = document.createElement("td");
       dateCell.textContent = formatDate(record.loginAt);
 
-      row.append(emailCell, dateCell);
+      row.append(numberCell, emailCell, dateCell);
       historyTableBody.append(row);
-    }
+    });
+
+    historyMessage.textContent =
+      `Showing ${records.length} of the latest 20 available login records.`;
   }
+
 
   function showStudents() {
     selectedStudent = null;
+
     historySection.classList.add("hidden");
     studentsSection.classList.remove("hidden");
+
+    // Keep the same category selected: All, Online, or Offline.
+    renderStudents();
   }
 
+
   async function loadFirestoreData() {
-    statusMessage.textContent = "Loading student and login-history records…";
+    $("statusMessage").className = "message";
+    $("statusMessage").textContent =
+      "Loading student and login-history records…";
 
     // Read student profiles.
-    const usersSnapshot = await getDocs(collection(db, "users"));
+    const usersSnapshot = await getDocs(
+      collection(db, "users")
+    );
+
     students = usersSnapshot.docs.map(documentSnapshot => ({
       id: documentSnapshot.id,
       ...documentSnapshot.data()
     }));
 
-    // Read login events.
-    const historySnapshot = await getDocs(collection(db, "loginHistory"));
+    // Read recorded login events.
+    const historySnapshot = await getDocs(
+      collection(db, "loginHistory")
+    );
+
     loginRecords = historySnapshot.docs.map(documentSnapshot => ({
       id: documentSnapshot.id,
       ...documentSnapshot.data()
     }));
 
     renderStudents();
-    statusMessage.className = "message";
-    statusMessage.textContent = `Loaded ${students.length} student records and ${loginRecords.length} login-history records.`;
+
+    $("statusMessage").textContent =
+      `Loaded ${students.length} student records and ` +
+      `${loginRecords.length} login-history records.`;
   }
 
-  function startPresenceListener() {
-    if (presenceListenerStarted) return;
-    presenceListenerStarted = true;
 
+  function startPresenceListener() {
     const presenceRef = ref(rtdb, "presence");
 
     onValue(
       presenceRef,
+
       snapshot => {
         presenceRecords = snapshot.val() || {};
-        presenceMessage.textContent = "Live presence data updated.";
+        presenceReady = true;
+        presenceError = false;
+
+        $("presenceMessage").className = "message";
+        $("presenceMessage").textContent =
+          "Live presence data updated.";
+
         renderStudents();
+
+        // If the admin is currently viewing a student list,
+        // update it as presence changes.
+        if (!historySection.classList.contains("hidden")) {
+          return;
+        }
       },
+
       error => {
-        presenceMessage.className = "message error";
-        presenceMessage.textContent = `Could not read Realtime Database presence: ${error.message}`;
+        presenceReady = false;
+        presenceError = true;
+
+        $("presenceMessage").className = "message error";
+        $("presenceMessage").textContent =
+          `Could not read Realtime Database presence: ${error.message}`;
+
+        renderStudents();
       }
     );
   }
 
-  document.getElementById("backButton").addEventListener("click", showStudents);
 
-  document.getElementById("refreshButton").addEventListener("click", async () => {
-    const button = document.getElementById("refreshButton");
+  // Summary-card actions
+  $("totalCard").addEventListener("click", () => {
+    showStudentList("all");
+  });
+
+  $("onlineCard").addEventListener("click", () => {
+    showStudentList("online");
+  });
+
+  $("offlineCard").addEventListener("click", () => {
+    showStudentList("offline");
+  });
+
+
+  // Back actions
+  $("backButton").addEventListener("click", showStudents);
+
+  $("listBackButton").addEventListener("click", () => {
+    studentsSection.classList.add("hidden");
+  });
+
+
+  // Refresh data without losing the current category or student.
+  $("refreshButton").addEventListener("click", async () => {
+    const button = $("refreshButton");
     button.disabled = true;
 
     try {
       await loadFirestoreData();
-      if (selectedStudent) showStudentHistory(selectedStudent);
+
+      if (selectedStudent) {
+        showStudentHistory(selectedStudent);
+      }
     } catch (error) {
-      showError(`Refresh failed: ${error.code || ""} ${error.message}`);
+      showError(
+        `Refresh failed: ${error.code || ""} ${error.message}`
+      );
     } finally {
       button.disabled = false;
     }
   });
 
+
+  // Initialize Firebase and verify administrator access.
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
@@ -404,14 +760,21 @@
 
     onAuthStateChanged(auth, async user => {
       if (!user) {
-        showError("You are not signed in. Sign in to the website with the administrator account, then reopen this page.");
+        showError(
+          "You are not signed in. Sign in to the website with " +
+          "the administrator account, then reopen this page."
+        );
+
         studentsSection.classList.add("hidden");
         historySection.classList.add("hidden");
         return;
       }
 
       if (user.uid !== ADMIN_UID) {
-        showError(`Administrator access denied. Signed-in UID: ${user.uid}`);
+        showError(
+          `Administrator access denied. Signed-in UID: ${user.uid}`
+        );
+
         studentsSection.classList.add("hidden");
         historySection.classList.add("hidden");
         return;
@@ -422,12 +785,18 @@
         startPresenceListener();
       } catch (error) {
         showError(
-          `Firebase could not load records.\nError code: ${error.code || "unknown"}\nDetails: ${error.message}\n\nCheck the Web API key, Firebase project, collection names, and published Firestore/Realtime Database rules.`
+          `Firebase could not load records.\n` +
+          `Error code: ${error.code || "unknown"}\n` +
+          `Details: ${error.message}\n\n` +
+          `Check Firebase configuration, collection names, ` +
+          `and published database security rules.`
         );
       }
     });
   } catch (error) {
-    showError(`Firebase initialization failed: ${error.message}`);
+    showError(
+      `Firebase initialization failed: ${error.message}`
+    );
   }
 </script>
 </body>
